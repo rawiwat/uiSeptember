@@ -4,19 +4,21 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -27,18 +29,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.LineChart
@@ -56,20 +63,40 @@ import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.toModel
+import com.example.uiassignmentseptember.viewModel.SwipeableViewModel
+import kotlin.math.roundToInt
+
 
 @Composable
-fun InfoScreen(id: Int,context: Context) {
+fun InfoScreen(
+    id: Int,
+    context: Context,
+    navController: NavController
+    //swipeableViewModel: SwipeableViewModel,
+    //screenStackIndex: Int
+) {
     val model = FakeDatabase().getModelFromID(id).toModel()
     var readMore by rememberSaveable {
         mutableStateOf(false)
     }
+    var offsetX by remember { mutableFloatStateOf(0f) }
     val scrollState = rememberScrollState()
 
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .background(color = Color.Black)
+            .offset { IntOffset(offsetX.roundToInt(), 0) }
+            .pointerInput(Unit) {
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    offsetX += dragAmount.x
+                    println(offsetX)
+                    if (offsetX >= 10f || offsetX <= 10f) {
+                        navController.navigate("Home")
+                    }
+                }
+            }
     ) {
         Column(
             modifier = Modifier
@@ -80,10 +107,14 @@ fun InfoScreen(id: Int,context: Context) {
                 text = model.detail,
                 maxLines = if (readMore) Int.MAX_VALUE else 3,
                 overflow = TextOverflow.Ellipsis,
+                style = TextStyle(color = Color.White),
+                modifier = Modifier.animateContentSize(animationSpec = tween(1000))
             )
             Text(
                 text = if (readMore) "Show Less" else "Read More",
-                modifier = Modifier.clickable { readMore = !readMore }
+                modifier = Modifier
+                    .clickable { readMore = !readMore },
+                style = TextStyle(color = colorResource(id = R.color.teal_200))
             )
         }
     }
@@ -95,7 +126,7 @@ fun Graph(
     context: Context
 ) {
     var currentOutPut by rememberSaveable {
-        mutableStateOf(GraphOutputType.YEAR)
+        mutableStateOf(GraphOutputType.WEEK)
     }
 
     DisposableEffect(currentOutPut){
@@ -132,49 +163,48 @@ fun Graph(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            Button(
-                onClick = { currentOutPut = GraphOutputType.HOUR }
-            ) {
-                Text(text = "1H")
-            }
+            GraphOutPutSelector(
+                currentType = currentOutPut,
+                thisType = GraphOutputType.HOUR,
+                buttonText = "1H",
+                context = context
+            )
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            Button(
-                onClick = { currentOutPut = GraphOutputType.DAY }
-            ) {
-                Text(text = "1D")
-            }
+            GraphOutPutSelector(
+                currentType = currentOutPut,
+                thisType = GraphOutputType.DAY,
+                buttonText = "1D",
+                context = context
+            )
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            Button(
-                onClick = { currentOutPut = GraphOutputType.WEEK }
-            ) {
-                Text(text = "1W")
-            }
+            GraphOutPutSelector(
+                currentType = currentOutPut,
+                thisType = GraphOutputType.WEEK,
+                buttonText = "1W",
+                context = context
+            )
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            Button(
-                onClick = { currentOutPut = GraphOutputType.MONTH }
-            ) {
-                Text(text = "1M")
-            }
+            GraphOutPutSelector(
+                currentType = currentOutPut,
+                thisType = GraphOutputType.MONTH,
+                buttonText = "1M",
+                context = context
+            )
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            Button(
-                onClick = { currentOutPut = GraphOutputType.YEAR },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (currentOutPut == GraphOutputType.YEAR) {
-                        colorResource(R.color.teal_700)
-                    } else { Color.Black },
-                    contentColor = colorResource(R.color.teal_200)
-                )
-            ) {
-                Text(text = "1Y")
-            }
+            GraphOutPutSelector(
+                currentType = currentOutPut,
+                thisType = GraphOutputType.YEAR,
+                buttonText = "1Y",
+                context = context
+            )
         }
     }
 }
@@ -182,7 +212,7 @@ fun Graph(
 @Preview(showBackground = true)
 @Composable
 fun InfoPreview() {
-    InfoScreen(id = 1, LocalContext.current)
+    InfoScreen(id = 1, LocalContext.current, navController = NavController(LocalContext.current))
 }
 
 fun generateChartData(
@@ -207,7 +237,14 @@ fun generateChartData(
                     ),
                     SelectionHighlightPoint(),
                     ShadowUnderLine(
-                        color = lineColor,
+                        alpha = 0.5f,
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                lineColor,
+                                lineColor,
+                                Color.Transparent,
+                            )
+                        ),
                     ),
                     SelectionHighlightPopUp()
                 )
@@ -229,15 +266,18 @@ fun GraphOutPutSelector(
     Button(
         onClick = {
             val intent = Intent("ChangeGraphOutput")
-            intent.putExtra("ChangeGraphOutput",thisType)
+            intent.putExtra("ChangeGraphOutput",thisType.name)
             context.sendBroadcast(intent)
                   },
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (currentType == GraphOutputType.YEAR) {
+            containerColor = if (currentType == thisType) {
                 colorResource(R.color.teal_700)
             } else { Color.Black },
-            contentColor = colorResource(R.color.teal_200)
-        )
+            contentColor = if (currentType == thisType) {
+                colorResource(id = R.color.teal_200)
+            } else { colorResource(id = R.color.teal_700) }
+        ),
+//        border = BorderStroke(3.dp,Color.Cyan)
     ) {
         Text(text = buttonText)
     }

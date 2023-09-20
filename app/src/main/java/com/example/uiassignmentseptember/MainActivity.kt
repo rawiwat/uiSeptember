@@ -1,5 +1,6 @@
 package com.example.uiassignmentseptember
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,23 +17,26 @@ import androidx.navigation.navArgument
 import com.example.uiassignmentseptember.compose.HomeScreen
 import com.example.uiassignmentseptember.compose.InfoScreen
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+//@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             UiAssignmentSeptemberTheme {
-                // A surface container using the 'background' color from the theme
                 navController = rememberNavController()
-                App(navController as NavHostController)
+                App(navController as NavHostController,this@MainActivity)
+                //NavigationScreen(context = this@MainActivity)
             }
         }
     }
 }
 
 @Composable
-fun App(navController: NavHostController) {
+fun App(navController: NavHostController,context: Context) {
+    val animationTime = 1100
     NavHost(
         navController = navController,
         startDestination = "Home"
@@ -42,17 +46,19 @@ fun App(navController: NavHostController) {
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(800)
+                    animationSpec = tween(animationTime)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(800)
+                    animationSpec = tween(animationTime)
                 )
             }
         ) {
-            HomeScreen(navController = navController)
+            HomeScreen(
+                navController = navController,
+            )
         }
 
         composable(
@@ -65,17 +71,22 @@ fun App(navController: NavHostController) {
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(800)
+                    animationSpec = tween(animationTime)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(800)
+                    animationSpec = tween(animationTime)
                 )
             }
         ) {
-            InfoScreen(it.arguments!!.getInt("id"))
+            InfoScreen(
+                it.arguments!!.getInt("id"),
+                context,
+                navController
+                )
         }
     }
 }
+

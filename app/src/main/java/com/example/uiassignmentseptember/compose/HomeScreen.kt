@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,14 +36,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.uiassignmentseptember.R
+import com.example.uiassignmentseptember.model.AppScreenTypes
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.toModel
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
+import com.example.uiassignmentseptember.viewModel.SwipeableViewModel
+import androidx.compose.material3.Surface as Surface1
 
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    //screenStackIndex: Int,
+    //swipeableViewModel: SwipeableViewModel
 ) {
     val dataList by rememberSaveable {
         mutableStateOf(FakeDatabase().getFakeData())
@@ -52,41 +56,43 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
 
-    Surface {
-
-    }
-    Surface(
+    Surface1(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
             .background(Color.Black)
-            ) {
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .height(1000.dp)
                 .background(Color.Black),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+            horizontalAlignment = Alignment.CenterHorizontally,) {
             for (data in dataList) {
-                Selector(data,navController)
+                Selector(
+                    data, //swipeableViewModel
+                    navController
+                )
             }
         }
     }
+
 }
 
 @Composable
 fun Selector(
     model: Model,
+    //swipeableViewModel: SwipeableViewModel
     navController: NavController
 ) {
     val primaryTextColor = colorResource(id = R.color.teal_200)
     val secondaryTextColor = colorResource(id = R.color.teal_700)
     val textFont = FontFamily(Font(R.font.impact))
-    Surface(
+    Surface1(
         modifier = Modifier
             .clickable {
                 navController.navigate("infoScreen/${model.id}")
+                //swipeableViewModel.pushToBackStack(AppScreenTypes.Screen2())
             }
             .height(75.dp)
             .fillMaxWidth()
@@ -168,21 +174,5 @@ fun Selector(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SelectorPreview() {
-    UiAssignmentSeptemberTheme {
-        Selector(model = FakeDatabase().getModelFromID(2).toModel(), navController = NavController(LocalContext.current))
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    UiAssignmentSeptemberTheme {
-        HomeScreen(navController = NavController(LocalContext.current))
     }
 }
