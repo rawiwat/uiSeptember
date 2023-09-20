@@ -1,5 +1,7 @@
 package com.example.uiassignmentseptember.model
 
+import androidx.compose.ui.graphics.Color
+import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.model.LineChartData
 
 data class Model(
@@ -11,7 +13,8 @@ data class Model(
     val description: String,
     val imageId: Int,
     val detail: String,
-    val chartData: LineChartData
+    val pointData: List<Point>,
+    val chartColor: Color
 )
 fun Model?.toModel(): Model = Model(
     this!!.id,
@@ -22,5 +25,6 @@ fun Model?.toModel(): Model = Model(
     this.description,
     this.imageId,
     this.detail,
-    this.chartData
+    this.pointData,
+    this.chartColor
 )

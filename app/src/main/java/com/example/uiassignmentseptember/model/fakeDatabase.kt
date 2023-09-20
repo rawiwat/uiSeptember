@@ -3,20 +3,20 @@ package com.example.uiassignmentseptember.model
 import androidx.compose.ui.graphics.Color
 import co.yml.charts.common.model.Point
 import com.example.uiassignmentseptember.R
-import com.example.uiassignmentseptember.compose.generateAXizX
-import com.example.uiassignmentseptember.compose.generateAxizY
+import com.example.uiassignmentseptember.compose.generateAXisX
+import com.example.uiassignmentseptember.compose.generateAxisY
 import com.example.uiassignmentseptember.compose.generateChartData
+import kotlin.random.Random
 
 class FakeDatabase {
-    private val samplePoint1: List<Point> =
-        listOf(Point(0f, 40f), Point(1f, 90f), Point(2f, 0f), Point(3f, 60f), Point(4f, 10f))
+    private val samplePoint1: List<Point> = generatePointData()
     private val sample1 = Model(
         1,
-        "joe",
+        "joe Biden",
         22.12,
         12.12,
-        false,
-        "Joe mama",
+        true,
+        "A.K.A. sleepy Joe",
         R.drawable.random_icon1,
         "Avocados are a fruit, not a vegetable. They're technically considered a single-seeded berry, believe it or not.\n" +
                 "The Eiffel Tower can be 15 cm taller during the summer, due to thermal expansion meaning the iron heats up, the particles gain kinetic energy and take up more space.\n" +
@@ -33,16 +33,11 @@ class FakeDatabase {
                 "Amy Poehler was only seven years older than Rachel McAdams when she took on the role of \"cool mom\" in Mean Girls. Rachel was 25 as Regina George - Amy was 32 as her mum.\n" +
                 "People are more creative in the shower. When we take a warm shower, we experience an increased dopamine flow that makes us more creative.\n" +
                 "Baby rabbits are called kits. Cute!",
-        generateChartData(
-            samplePoint1,
-            Color.Blue,
-            generateAXizX(samplePoint1,50,10, Color.Black),
-            generateAxizY(75,10, Color.Green)
-        )
+        samplePoint1,
+        Color.Blue
     )
 
-    private val samplePoint2: List<Point> =
-        listOf(Point(0f, 40f), Point(1f, 90f), Point(2f, 0f), Point(3f, 60f), Point(4f, 10f))
+    private val samplePoint2: List<Point> = generatePointData()
     private val sample2 = Model(
         2,
         "Micheal",
@@ -66,23 +61,18 @@ class FakeDatabase {
                 "Louboutins' iconic red soles were inspired by Andy Warhol. The 60s pop artist's drawing Flowers caught the eye of the famous designer which gave him the idea to add the infamous sole to his designs.\n" +
                 "A book called 'A la recherche du temps perdu' by Marcel Proust contains an estimated 9,609,000 characters, making it the longest book in the world. The title translates to \"Remembrance of Things Past\".\n" +
                 "Google images was literally created after Jennifer Lopez wore that infamous dress at the 2000 Grammys. So many people were searching for her outfit, the search engine added an imagine function.",
-        generateChartData(
-            samplePoint2,
-            Color.Red,
-            generateAXizX(samplePoint2,50,10, Color.Cyan),
-            generateAxizY(75,10, Color.Yellow)
-        )
+        samplePoint2,
+        Color.Yellow
     )
 
-    private val samplePoint3: List<Point> =
-        listOf(Point(0f, 40f), Point(1f, 90f), Point(2f, 0f), Point(3f, 60f), Point(4f, 10f))
+    private val samplePoint3: List<Point> = generatePointData()
     private val sample3 = Model(
         3,
-        "joe",
+        "Pizza Hut",
         32.18,
         05.42,
-        false,
-        "Joe mama",
+        true,
+        "No one out Pizza the Hut",
         R.drawable.random_icon3,
         "Big Ben's clock stopped at 10:07 p.m. on 27 May 2005, most likely due to an extremely hot temperature of 31.8 degrees Celsius.\n" +
                 "Walt Disney currently holds the most Academy Awards. Disney won 26 Oscars over the course of his career and was nominated a grand total of 59 times.\n" +
@@ -99,23 +89,18 @@ class FakeDatabase {
                 "The Chupa Chups logo was designed by Salvador Dalí. The surrealist artist designed the logo in 1969.\n" +
                 "Ketchup was once sold as medicine. The condiment was prescribed and sold to people suffering with indigestion back in 1834.\n" +
                 "The world's longest walking distance is 14,000 miles. You can walk from Magadan in Russia to Cape Town in South Africa. It requires no flying or sailing - just bridges and open roads.",
-        generateChartData(
-            samplePoint3,
-            Color.Yellow,
-            generateAXizX(samplePoint3,50,10, Color.Black),
-            generateAxizY(75,10, Color.White)
-        )
+        samplePoint3,
+        Color.Green
     )
 
-    private val samplePoint4: List<Point> =
-        listOf(Point(0f, 40f), Point(1f, 90f), Point(2f, 0f), Point(3f, 60f), Point(4f, 10f))
+    private val samplePoint4: List<Point> = generatePointData()
     private val sample4 = Model(
         4,
-        "joe",
+        "Ocean Man",
         12.12,
         24.42,
         false,
-        "Joe mama",
+        "take me by the hand",
         R.drawable.ic_launcher_background,
         "The moon has moonquakes. They happen due to tidal stresses connected to the distance between the moon and the Earth.\n" +
                 "Humans are the only animals that blush. Apparently, we're also the only animals that experience embarrassment, too. This is because it's a complex emotion that involves understanding other people's opinions.\n" +
@@ -132,23 +117,18 @@ class FakeDatabase {
                 "Kim Kardashian knows the alphabet in sign language. Apparently, she used it to cheat on tests with her friends at school.\n" +
                 "In the course of an average lifetime, while sleeping you could eat around 70 different insects and 10 spiders, or more. Ew.\n" +
                 "Everyone's tongue print is different. Like the fingerprint, it has unique features that differ from person to person.",
-        generateChartData(
-            samplePoint4,
-            Color.Green,
-            generateAXizX(samplePoint4,50,10, Color.Black),
-            generateAxizY(75,10, Color.Magenta)
-        )
+        samplePoint4,
+        Color.Red
     )
 
-    private val samplePoint5: List<Point> =
-        listOf(Point(0f, 40f), Point(1f, 90f), Point(2f, 0f), Point(3f, 60f), Point(4f, 10f))
+    private val samplePoint5: List<Point> = generatePointData()
     private val sample5 = Model(
         5,
-        "joe",
+        "JFK",
         69.96,
         11.50,
-        false,
-        "Joe mama",
+        true,
+        "getting milk",
         R.drawable.ic_launcher_foreground,
         "It would take 19 minutes to fall to the centre of the Earth. Scientists have worked this out, they haven't tried it in real life.\n" +
                 "The Night's Watch cloaks in Game of Thrones were made from Ikea rugs. The show bought the rugs, shaved them down and then dyed them to make the cloaks.\n" +
@@ -164,12 +144,8 @@ class FakeDatabase {
                 "Dolphins have names for one another. According to National Geographic, dolphins use a unique whistle to distinguish between different members in their pod.\n" +
                 "The blob of toothpaste on a toothbrush has a name. It's called a 'nurdle' and there was once a lawsuit over which toothpaste company had the right to portray it.\n" +
                 "One part of Istanbul is in Europe and the other is in Asia. Part of it neighbours Greece and Bulgaria (therefore sitting in Europe) and the other part neighbours Syria, Iran, and Iraq beyond Turkey’s borders (therefore classing as Asia). The Bosphorus Strait runs between them - a narrow body of water that connects the Black Sea to the Mediterranean Sea via the Sea of Marmara.",
-        generateChartData(
-            samplePoint5,
-            Color.Cyan,
-            generateAXizX(samplePoint5,50,10, Color.Gray),
-            generateAxizY(75,10, Color.Green)
-        )
+        samplePoint5,
+        Color.Magenta
     )
 
     fun getFakeData(): List<Model> {
@@ -193,5 +169,16 @@ class FakeDatabase {
             println(e)
         }
         return null
+    }
+
+    private fun generatePointData():List<Point> {
+        var current = 0f
+        val size = 1000
+        val result = mutableListOf<Point>()
+        repeat(size) {
+            result.add(Point(current, Random.nextInt(0,100).toFloat()))
+            current += 1f
+        }
+        return result
     }
 }

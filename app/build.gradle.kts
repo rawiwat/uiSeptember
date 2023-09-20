@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.uiassignmentseptember"
-        minSdk = 31
+        minSdk = 33
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -66,5 +66,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("co.yml:ycharts:2.1.0")
-    implementation("androidx.navigation:navigation-compose:2.5.0")
+    implementation("androidx.navigation:navigation-compose:2.7.2")
 }
