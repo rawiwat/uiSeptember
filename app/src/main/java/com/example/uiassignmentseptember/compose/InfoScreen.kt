@@ -6,12 +6,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,8 +26,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -49,10 +49,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -71,7 +74,6 @@ import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.toModel
-import com.example.uiassignmentseptember.viewModel.SwipeableViewModel
 import kotlin.math.roundToInt
 
 
@@ -90,54 +92,210 @@ fun InfoScreen(
     var offsetX by remember { mutableFloatStateOf(0f) }
     val scrollState = rememberScrollState()
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .offset { IntOffset(offsetX.roundToInt(), 0) }
-            .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
-                    change.consume()
-                    offsetX += dragAmount.x
-                    println(offsetX)
-                    if (offsetX >= 10f || offsetX <= 10f) {
-                        navController.navigate("Home")
-                    }
+    var isFavorite by rememberSaveable {
+        mutableStateOf(false)
+    }
+    val topIconSize = 20.dp
+    val primaryColor = colorResource(id = R.color.teal_200)
+    val secondaryColor = colorResource(id = R.color.teal_700)
+    val textFont = FontFamily(Font(R.font.impact))
+    val bodyFontSize = 14.sp
+    val splitedMoney = model.current.toString().split(".")
+
+    Scaffold(
+        topBar = {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color.Black)
+                    .height(50.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .background(color = Color.Black),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.point_back),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable { navController.navigate("Home") }
+                            .size(topIconSize)
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = Color.Transparent),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = "$${model.current}",
+                        style = TextStyle(
+                            color = primaryColor
+                        ),
+                        fontFamily = textFont
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = Color.Transparent),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.three_dots),
+                        contentDescription = null,
+                        modifier = Modifier.size(topIconSize)
+                    )
+
+                    Spacer(modifier = Modifier.width(15.dp))
+
+                    Image(
+                        painter = painterResource(
+                            id = if (isFavorite) {
+                                R.drawable.fav_is_selected
+                            } else { R.drawable.fav_not_selected }
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable { isFavorite = !isFavorite }
+                            .size(topIconSize)
+                    )
+
+                    Spacer(modifier = Modifier.width(15.dp))
+
                 }
             }
-    ) {
-        Column(
+
+        }
+    ) { innerPadding ->
+        Surface(
             modifier = Modifier
-                .background(color = Color.Black)
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .offset { IntOffset(offsetX.roundToInt(), 0) }
+                /*.pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        if (dragAmount.x >= 50f || dragAmount.x <= 50f ) {
+                            offsetX += dragAmount.x
+                        }
+                        if (offsetX >= 100f || offsetX <= 100f) {
+                            navController.navigate("Home")
+                        }
+                    }
+                }*/
+                .padding(innerPadding)
         ) {
-
-            Image(
-                painter = painterResource(id = model.imageId),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center,
+            if (scrollState.isScrollInProgress){
+                println("Scrolling:${scrollState.value}")
+            }
+            Column(
                 modifier = Modifier
-                    .size(50.dp)
-                    .padding(5.dp)
-                    .clip(CircleShape)
-            )
+                    .background(color = Color.Black)
+            ) {
+                Spacer(modifier = Modifier.height(15.dp))
 
-            Graph(model = model,context)
-            Text(
-                text = model.detail,
-                maxLines = if (readMore) Int.MAX_VALUE else 3,
-                overflow = TextOverflow.Ellipsis,
-                style = TextStyle(color = Color.White),
-                modifier = Modifier.animateContentSize(animationSpec = tween(1000))
-            )
-            Text(
-                text = if (readMore) "Show Less" else "Read More",
-                modifier = Modifier
-                    .clickable { readMore = !readMore },
-                style = TextStyle(color = colorResource(id = R.color.teal_200))
-            )
+                Column(
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = model.imageId),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(50.dp)
+                            .padding(5.dp)
+                            .clip(CircleShape)
+                    )
+
+                    Text(
+                        text = model.name,
+                        style = TextStyle(
+                            color = primaryColor
+                        ),
+                        fontFamily = textFont,
+                        fontSize = 13.sp
+                    )
+
+                    Row() {
+                        Text(
+                            text = "$${splitedMoney[0]}",
+                            style = TextStyle(
+                                color = primaryColor
+                            ),
+                            fontFamily = textFont,
+                            fontSize = 30.sp
+                        )
+                        Text(
+                            text = ".${splitedMoney[1]}",
+                            style = TextStyle(
+                                color = secondaryColor
+                            ),
+                            fontFamily = textFont,
+                            fontSize = 30.sp
+                        )
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(
+                                id = if(model.positiveGrowth)
+                                        R.drawable.up
+                                    else R.drawable.down
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(6.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = "${model.growthPercent}%",
+                            style = TextStyle(
+                                color = if (model.positiveGrowth) {
+                                    Color.Green
+                                } else {
+                                    Color.Red
+                                }
+                            ),
+                            fontFamily = textFont,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Graph(model = model,context)
+
+                Text(
+                    text = model.detail,
+                    maxLines = if (readMore) Int.MAX_VALUE else 3,
+                    overflow = TextOverflow.Ellipsis,
+                    style = TextStyle(color = Color.White),
+                    modifier = Modifier.animateContentSize(animationSpec = tween(1000))
+                )
+
+                Text(
+                    text = if (readMore) "Show Less" else "Read More",
+                    modifier = Modifier
+                        .clickable { readMore = !readMore },
+                    style = TextStyle(color = colorResource(id = R.color.teal_200))
+                )
+            }
         }
     }
+    
 }
 
 @Composable
