@@ -9,7 +9,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +28,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -43,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -89,7 +86,7 @@ fun InfoScreen(
     var readMore by rememberSaveable {
         mutableStateOf(false)
     }
-    var offsetX by remember { mutableFloatStateOf(0f) }
+    val offsetX by remember { mutableFloatStateOf(0f) }
     val scrollState = rememberScrollState()
 
     var isFavorite by rememberSaveable {
@@ -125,20 +122,30 @@ fun InfoScreen(
                     )
                 }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = Color.Transparent),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = "$${model.current}",
-                        style = TextStyle(
-                            color = primaryColor
-                        ),
-                        fontFamily = textFont
-                    )
-                }
+                //if(scrollState.value >= 280) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = Color.Transparent),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = "$${model.current}",
+                            style = TextStyle(
+                                color = primaryColor
+                            ),
+                            fontFamily = textFont
+                        )
+                        Row() {
+                            Image(
+                                painter = painterResource(id = model.imageId),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .
+                            )
+                        }
+                    }
+                //}
 
                 Row(
                     modifier = Modifier
@@ -283,14 +290,21 @@ fun InfoScreen(
                     maxLines = if (readMore) Int.MAX_VALUE else 3,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(color = Color.White),
-                    modifier = Modifier.animateContentSize(animationSpec = tween(1000))
+                    modifier = Modifier.animateContentSize(animationSpec = tween(1000)),
+                    fontSize = bodyFontSize,
+                    fontFamily = textFont
                 )
 
                 Text(
                     text = if (readMore) "Show Less" else "Read More",
                     modifier = Modifier
-                        .clickable { readMore = !readMore },
-                    style = TextStyle(color = colorResource(id = R.color.teal_200))
+                        .clickable { readMore = !readMore }
+                        .padding(start = 5.dp),
+                    style = TextStyle(
+                        color = colorResource(id = R.color.teal_200)
+                    ),
+                    fontSize = bodyFontSize,
+                    fontFamily = textFont
                 )
             }
         }
@@ -324,16 +338,18 @@ fun Graph(
         LineChart(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp),
+                .height(250.dp)
+                .background(color = Color.Black)
+            ,
             lineChartData = generateChartData(
                 pointsData = getPointData(currentOutPut,model.pointData),
                 lineColor = model.chartColor,
                 xAxisData = generateAXisX(
                     getPointData(currentOutPut,model.pointData),
                     getAxisXStepSize(currentOutPut),
-                    5
+                    10
                 ),
-                yAxisData = generateAxisY(20,5)
+                yAxisData = generateAxisY(20,0)
             ),
         )
 
@@ -457,7 +473,10 @@ fun GraphOutPutSelector(
         ),
 //        border = BorderStroke(3.dp,Color.Cyan)
     ) {
-        Text(text = buttonText)
+        Text(
+            text = buttonText,
+            fontFamily = FontFamily(Font(R.font.impact))
+        )
     }
 }
 
