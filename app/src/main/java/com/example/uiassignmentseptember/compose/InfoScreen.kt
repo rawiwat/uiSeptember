@@ -6,9 +6,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +28,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -71,6 +77,7 @@ import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.toModel
+import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
 import kotlin.math.roundToInt
 
 
@@ -87,7 +94,8 @@ fun InfoScreen(
         mutableStateOf(false)
     }
     val offsetX by remember { mutableFloatStateOf(0f) }
-    val scrollState = rememberScrollState()
+    val screenScrollState = rememberScrollState()
+    val linksScrollState = rememberScrollState()
 
     var isFavorite by rememberSaveable {
         mutableStateOf(false)
@@ -122,30 +130,45 @@ fun InfoScreen(
                     )
                 }
 
-                //if(scrollState.value >= 280) {
+                if(screenScrollState.value >= 280) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(color = Color.Transparent),
                         horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
                         Text(
                             text = "$${model.current}",
                             style = TextStyle(
                                 color = primaryColor
                             ),
-                            fontFamily = textFont
+                            fontFamily = textFont,
+                            fontSize = 16.sp
                         )
                         Row() {
                             Image(
                                 painter = painterResource(id = model.imageId),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .
+                                    .size(22.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            Spacer(modifier = Modifier.width(2.dp))
+
+                            Text(
+                                text = model.name,
+                                style = TextStyle(
+                                    color = secondaryColor
+                                ),
+                                fontSize = 13.sp,
+                                fontFamily = textFont
                             )
                         }
                     }
-                //}
+                }
 
                 Row(
                     modifier = Modifier
@@ -178,13 +201,36 @@ fun InfoScreen(
 
                 }
             }
-
+        },
+        bottomBar = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = primaryColor,
+                        contentColor = Color.Black
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = Color.Black)
+                        .padding(6.dp),
+                    shape = CircleShape
+                ) {
+                    Text(
+                        text = "Swap",
+                        fontSize = 22.sp,
+                        fontFamily = textFont
+                    )
+                }
+            }
         }
     ) { innerPadding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)
+                .verticalScroll(screenScrollState)
                 .offset { IntOffset(offsetX.roundToInt(), 0) }
                 /*.pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
@@ -199,8 +245,8 @@ fun InfoScreen(
                 }*/
                 .padding(innerPadding)
         ) {
-            if (scrollState.isScrollInProgress){
-                println("Scrolling:${scrollState.value}")
+            if (screenScrollState.isScrollInProgress){
+                println("Scrolling:${screenScrollState.value}")
             }
             Column(
                 modifier = Modifier
@@ -285,31 +331,178 @@ fun InfoScreen(
 
                 Graph(model = model,context)
 
-                Text(
-                    text = model.detail,
-                    maxLines = if (readMore) Int.MAX_VALUE else 3,
-                    overflow = TextOverflow.Ellipsis,
-                    style = TextStyle(color = Color.White),
-                    modifier = Modifier.animateContentSize(animationSpec = tween(1000)),
-                    fontSize = bodyFontSize,
-                    fontFamily = textFont
-                )
-
-                Text(
-                    text = if (readMore) "Show Less" else "Read More",
+                Column(
                     modifier = Modifier
-                        .clickable { readMore = !readMore }
-                        .padding(start = 5.dp),
-                    style = TextStyle(
-                        color = colorResource(id = R.color.teal_200)
-                    ),
-                    fontSize = bodyFontSize,
-                    fontFamily = textFont
-                )
+                        .padding(start = 6.dp,end = 6.dp)
+                ) {
+
+                    Spacer(modifier = Modifier.height(9.dp))
+
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        val canvasWidth = size.width
+                        val canvasHeight = size.height
+                        drawLine(
+                            start = Offset(x = canvasWidth, y = 0f),
+                            end = Offset(x = 0f, y = canvasHeight),
+                            color = secondaryColor
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(9.dp))
+
+                    Text(
+                        text = "Your balance",
+                        style = TextStyle(
+                            color = secondaryColor
+                        ),
+                        fontFamily = textFont,
+                        fontSize = bodyFontSize
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Start,
+                            modifier = Modifier
+                        ) {
+                            Text(
+                                text = "$4.20",
+                                style = TextStyle(
+                                    color = Color.White
+                                ),
+                                fontFamily = textFont,
+                                fontSize = bodyFontSize
+                            )
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.share_plane),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(22.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(5.dp))
+                        }
+                    }
+
+                    Text(
+                        text = "1.8.2 Lime",
+                        style = TextStyle(
+                            color = secondaryColor
+                        ),
+                        fontFamily = textFont,
+                        fontSize = bodyFontSize
+                    )
+
+                    Spacer(modifier = Modifier.height(9.dp))
+
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        val canvasWidth = size.width
+                        val canvasHeight = size.height
+                        drawLine(
+                            start = Offset(x = canvasWidth, y = 0f),
+                            end = Offset(x = 0f, y = canvasHeight),
+                            color = secondaryColor
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(9.dp))
+
+                    Text(
+                        text = model.detail,
+                        maxLines = if (readMore) Int.MAX_VALUE else 3,
+                        overflow = TextOverflow.Ellipsis,
+                        style = TextStyle(color = Color.White),
+                        modifier = Modifier.animateContentSize(animationSpec = tween(1000)),
+                        fontSize = bodyFontSize,
+                        fontFamily = textFont
+                    )
+
+                    Text(
+                        text = if (readMore) "Show Less" else "Read More",
+                        modifier = Modifier
+                            .clickable { readMore = !readMore },
+                        style = TextStyle(
+                            color = colorResource(id = R.color.teal_200)
+                        ),
+                        fontSize = bodyFontSize,
+                        fontFamily = textFont
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Stats",
+                        style = TextStyle(
+                            color = secondaryColor
+                        ),
+                        fontSize = bodyFontSize,
+                        fontFamily = textFont
+                    )
+
+                    Stats(
+                        money = "23.15M",
+                        name = "Doritos",
+                        textFont = textFont
+                    )
+
+                    Stats(
+                        money = "14.16M",
+                        name = "Pringle",
+                        textFont = textFont
+                    )
+
+                    Stats(
+                        money = "16.75M",
+                        name = "Tarkis",
+                        textFont = textFont
+                    )
+
+                    Stats(
+                        money = "21.15M",
+                        name = "Lays",
+                        textFont = textFont
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Stats",
+                        style = TextStyle(
+                            color = secondaryColor
+                        ),
+                        fontSize = bodyFontSize,
+                        fontFamily = textFont
+                    )
+
+                    Row(
+                        modifier = Modifier.scrollable(
+                            linksScrollState,
+                            orientation = Orientation.Horizontal
+                        )
+                    ) {
+                        Links(imageId = R.drawable.internet_icon, text = "Website")
+                        Links(imageId = R.drawable.facebook_icon, text = "Facebook")
+                        Links(imageId = R.drawable.youtube_icon, text = "Youtube")
+                        Links(imageId = R.drawable.twitter_icon, text = "Twitter")
+                    }
+                }
             }
         }
     }
-    
 }
 
 @Composable
@@ -480,6 +673,97 @@ fun GraphOutPutSelector(
     }
 }
 
+@Composable
+fun Stats(
+    name: String,
+    money: String,
+    textFont: FontFamily
+) {
+    Surface(
+        modifier = Modifier.background(color = Color.Black)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .background(color = Color.Black)
+                .fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.stats_icon),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(16.dp),
+                contentScale = ContentScale.FillBounds
+            )
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            Text(
+                text = name,
+                style = TextStyle(
+                    color = Color.White
+                ),
+                fontSize = 15.sp,
+                fontFamily = textFont
+            )
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "$$money",
+                style = TextStyle(
+                    color = Color.White
+                ),
+                fontSize = 15.sp,
+                fontFamily = textFont
+            )
+        }
+    }
+
+}
+
+@Composable
+fun Links(
+    imageId: Int,
+    text: String
+) {
+    Card(
+        modifier = Modifier.width(80.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.DarkGray
+        )
+    ) {
+        Row {
+            Image(
+                painter = painterResource(id = imageId),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center,
+                modifier = Modifier
+                    .size(20.dp)
+                    .padding(1.dp)
+                    .clip(CircleShape)
+            )
+
+            Text(
+                text = text,
+                style = TextStyle(
+                    color = Color.White
+                ),
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(R.font.impact)),
+                maxLines = 1,
+                overflow = TextOverflow.Clip
+            )
+        }
+
+    }
+}
+
 fun generateAXisX(
     pointsData: List<Point>,
     stepSize: Int,
@@ -526,4 +810,22 @@ fun getPointData(type: GraphOutputType, fullData:List<Point>):List<Point> {
         GraphOutputType.MONTH -> fullData.subList(0,60)
         GraphOutputType.YEAR -> fullData.subList(0,200)
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun StatsPreview() {
+    UiAssignmentSeptemberTheme {
+        Stats(
+            name = "Nissan",
+            money = "58.1M",
+            textFont = FontFamily(Font(R.font.impact))
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LinksPreview() {
+    Links(imageId = R.drawable.facebook_icon, text = "Facebook")
 }
