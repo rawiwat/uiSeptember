@@ -58,6 +58,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
     implementation("com.google.dagger:hilt-android:2.44")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -71,4 +72,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("co.yml:ycharts:2.1.0")
     implementation("androidx.navigation:navigation-compose:2.7.2")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 }

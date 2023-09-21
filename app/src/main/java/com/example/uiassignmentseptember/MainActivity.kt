@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun App(navController: NavHostController,context: Context) {
-    val animationTime = 1100
+    val animationTime = 1200
     NavHost(
         navController = navController,
         startDestination = "Home"
