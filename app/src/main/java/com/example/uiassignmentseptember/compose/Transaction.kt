@@ -22,11 +22,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,7 +47,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -75,7 +72,9 @@ fun Transaction(
     context: Context,
     modelId: Int
 ) {
-    val model = FakeDatabase().getModelFromID(modelId).toModel()
+    var model by remember {
+        mutableStateOf(FakeDatabase().getModelFromID(modelId).toModel())
+    }
     val primaryColor = colorResource(id = R.color.teal_200)
     val secondaryColor = colorResource(id = R.color.teal_700)
     var sendingMoney by rememberSaveable {
@@ -122,6 +121,25 @@ fun Transaction(
 
         onDispose{
             context.unregisterReceiver(moneyBroadcastReceiver)
+        }
+    }
+
+    DisposableEffect(model) {
+        val modelBroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(p0: Context?, p1: Intent?) {
+                val idReceived = p1!!.getIntExtra("change_model_to",model.id)
+                model = FakeDatabase().getModelFromID(idReceived).toModel()
+            }
+        }
+
+        context.registerReceiver(
+            modelBroadcastReceiver,
+            IntentFilter("change_model"),
+            Context.RECEIVER_EXPORTED
+        )
+
+        onDispose{
+            context.unregisterReceiver(modelBroadcastReceiver)
         }
     }
     Scaffold(
@@ -267,7 +285,12 @@ fun Transaction(
                                 horizontalAlignment = Alignment.End
                             ) {
                                 Card(
-                                    modifier = Modifier,
+                                    modifier = Modifier
+                                        .clickable {
+                                        val intent = Intent("Change_activate")
+                                        intent.putExtra("change_activation_to",true)
+                                        context.sendBroadcast(intent)
+                                        },
                                     colors = CardDefaults.cardColors(
                                         containerColor = Color.Black
                                     )
@@ -465,6 +488,7 @@ fun Transaction(
             }
         }
     }
+    ChangeModel(context = context)
 }
 
 fun getRawMoneyNumber(
@@ -497,7 +521,7 @@ fun NumberPanel(
                 context.sendBroadcast(intent)
             }
             .width(width.dp)
-            .height((width / 1.25).dp)
+            .height((width / 1.5).dp)
     ) {
         Text(
             text = value,
@@ -511,7 +535,9 @@ fun NumberPanel(
 }
 
 @Composable
-fun ChangeModel() {
+fun ChangeModel(
+    context:Context
+) {
     val configuration = LocalConfiguration.current
     var offset by rememberSaveable {
         mutableIntStateOf(configuration.screenHeightDp / 2)
@@ -529,19 +555,33 @@ fun ChangeModel() {
         R.drawable.token_unity
     )
 
-    val active by remember {
-        mutableStateOf(true)
+    var active by remember {
+        mutableStateOf(false)
     }
 
     DisposableEffect(active) {
-        onDispose {  }
+        val activationReceiver = object : BroadcastReceiver() {
+            override fun onReceive(p0: Context?, p1: Intent?) {
+                val activationReceived = p1!!.getBooleanExtra("change_activation_to", false)
+                offset = (configuration.screenHeightDp / 2)
+                active = activationReceived
+            }
+        }
+        context.registerReceiver(
+            activationReceiver,
+            IntentFilter("Change_activate"),
+            Context.RECEIVER_EXPORTED
+        )
+        onDispose {
+        context.unregisterReceiver(activationReceiver)
+        }
     }
 
     AnimatedVisibility(visible = active) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
+                .background(Color.Transparent)
                 .offset(0.dp, offset.dp)
         ) {
             Column(
@@ -559,9 +599,16 @@ fun ChangeModel() {
                             detectDragGestures { change, dragAmount ->
                                 change.consume()
                                 offset += dragAmount.y.toInt()
+                                if (offset < 0) {
+                                    offset = 0
+                                }
+
+                                if (offset >= (configuration.screenHeightDp * 3 / 4)) {
+                                    offset = (configuration.screenHeightDp / 2)
+                                    active = false
+                                }
                             }
-                        }
-                    ,
+                        },
                 ) {
                     val canvasWidth = size.width
 
@@ -675,20 +722,39 @@ fun ChangeModel() {
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                ModelOption(model = FakeDatabase().getModelFromID(1).toModel())
-                ModelOption(model = FakeDatabase().getModelFromID(2).toModel())
-                ModelOption(model = FakeDatabase().getModelFromID(3).toModel())
-                ModelOption(model = FakeDatabase().getModelFromID(4).toModel())
-                ModelOption(model = FakeDatabase().getModelFromID(5).toModel())
+                ModelOption(
+                    model = FakeDatabase().getModelFromID(1).toModel(),
+                    context = context
+                )
+
+                ModelOption(
+                    model = FakeDatabase().getModelFromID(2).toModel(),
+                    context = context
+                )
+
+                ModelOption(
+                    model = FakeDatabase().getModelFromID(3).toModel(),
+                    context = context
+                )
+
+                ModelOption(
+                    model = FakeDatabase().getModelFromID(4).toModel(),
+                    context = context
+                )
+
+                ModelOption(
+                    model = FakeDatabase().getModelFromID(5).toModel(),
+                    context = context
+                )
             }
         }
     }
-
 }
 
 @Composable
 fun ModelOption(
-    model: Model
+    model: Model,
+    context: Context
 ) {
     val primaryTextColor = colorResource(id = R.color.teal_200)
     val secondaryTextColor = colorResource(id = R.color.teal_700)
@@ -699,6 +765,12 @@ fun ModelOption(
     Surface(
         modifier = Modifier
             .clickable {
+                val intent = Intent("Change_activate")
+                intent.putExtra("change_activation_to", false)
+                context.sendBroadcast(intent)
+                val changeModel = Intent("change_model")
+                changeModel.putExtra("change_model_to",model.id)
+                context.sendBroadcast(changeModel)
             }
             .height(75.dp)
             .fillMaxWidth()
@@ -846,7 +918,9 @@ fun PreviewTransaction() {
 @Composable
 fun PreviewModelChanger() {
     UiAssignmentSeptemberTheme {
-        ChangeModel()
+        ChangeModel(
+            LocalContext.current
+        )
     }
 }
 
