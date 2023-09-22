@@ -4,11 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,9 +22,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -36,6 +40,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,6 +49,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -506,64 +513,177 @@ fun NumberPanel(
 @Composable
 fun ChangeModel() {
     val configuration = LocalConfiguration.current
-    val defaultOffset = configuration.screenHeightDp
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            //.offset(0.dp, defaultOffset.dp)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+    var offset by rememberSaveable {
+        mutableIntStateOf(configuration.screenHeightDp / 2)
+    }
+
+    val primaryColor = colorResource(id = R.color.teal_200)
+    val secondaryColor = colorResource(id = R.color.teal_700)
+    val textFont = FontFamily(Font(R.font.impact))
+    val listOfTokenImageId = listOf(
+        R.drawable.token_dgp,
+        R.drawable.token_dr,
+        R.drawable.token_discord,
+        R.drawable.token_doritos,
+        R.drawable.token_jgp,
+        R.drawable.token_unity
+    )
+
+    val active by remember {
+        mutableStateOf(true)
+    }
+
+    DisposableEffect(active) {
+        onDispose {  }
+    }
+
+    AnimatedVisibility(visible = active) {
+        Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color.Black)
+                .background(Color.Black)
+                .offset(0.dp, offset.dp)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Canvas(
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .width(50.dp)
-                ,
-            ) {                        
-                val canvasWidth = size.width
-
-                drawLine(
-                    start = Offset(x = canvasWidth, y = 0f),
-                    end = Offset(x = 0f, y = 0f),
-                    color = Color.Gray,
-                    strokeWidth = 7f
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(30.dp)
-                    .padding(
-                        start = 8.dp,
-                        end = 8.dp
-                    ),
-                colors = CardDefaults.cardColors(
-                    contentColor = Color.DarkGray,
-                    containerColor = Color.Gray,
-                )
+                    .fillMaxSize()
+                    .background(color = Color.Black)
             ) {
-                Row(
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Canvas(
                     modifier = Modifier
-                    .fillMaxSize(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Text(
-                        text = "Search tokens"
+                        .width(50.dp)
+                        .pointerInput(Unit) {
+                            detectDragGestures { change, dragAmount ->
+                                change.consume()
+                                offset += dragAmount.y.toInt()
+                            }
+                        }
+                    ,
+                ) {
+                    val canvasWidth = size.width
+
+                    drawLine(
+                        start = Offset(x = canvasWidth, y = 0f),
+                        end = Offset(x = 0f, y = 0f),
+                        color = Color.Gray,
+                        strokeWidth = 7f
                     )
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(30.dp)
+                        .padding(
+                            start = 8.dp,
+                            end = 8.dp
+                        ),
+                    colors = CardDefaults.cardColors(
+                        contentColor = Color.DarkGray,
+                        containerColor = Color.Gray,
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Image(
+                            painter = painterResource(id = R.drawable.search_icon),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = "Search tokens"
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Your tokens",
+                        style = TextStyle(
+                            color = secondaryColor
+                        ),
+                        fontSize = 20.sp,
+                        fontFamily = textFont
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Token(
+                            imageId = listOfTokenImageId[0],
+                            offsetX = 25
+                        )
+
+                        Token(
+                            imageId = listOfTokenImageId[1],
+                            offsetX = 20
+                        )
+
+                        Token(
+                            imageId = listOfTokenImageId[2],
+                            offsetX = 15
+                        )
+
+                        Token(
+                            imageId = listOfTokenImageId[3],
+                            offsetX = 10
+                        )
+
+                        Token(
+                            imageId = listOfTokenImageId[4],
+                            offsetX = 5
+                        )
+
+                        Token(
+                            imageId = listOfTokenImageId[5],
+                            offsetX = 0
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Image(
+                            painter = painterResource(id = R.drawable.point_back),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .rotate(-90f)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                ModelOption(model = FakeDatabase().getModelFromID(1).toModel())
+                ModelOption(model = FakeDatabase().getModelFromID(2).toModel())
+                ModelOption(model = FakeDatabase().getModelFromID(3).toModel())
+                ModelOption(model = FakeDatabase().getModelFromID(4).toModel())
+                ModelOption(model = FakeDatabase().getModelFromID(5).toModel())
             }
         }
     }
+
 }
 
 @Composable
@@ -685,6 +805,31 @@ fun ModelOption(
     }
 }
 
+@Composable
+fun Token(
+    imageId:Int,
+    offsetX:Int
+) {
+    Card(
+        modifier = Modifier
+            .size(16.dp)
+            .offset(x = offsetX.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = colorResource(id = R.color.teal_200)
+        )
+    ) {
+        Image(
+            painter = painterResource(id = imageId),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+
+            )
+    }
+
+}
+
 @Preview
 @Composable
 fun PreviewTransaction() {
@@ -697,18 +842,6 @@ fun PreviewTransaction() {
     }
 }
 
-/*@Preview
-@Composable
-fun PreviewTransaction2() {
-    UiAssignmentSeptemberTheme {
-        Transaction(
-            textFont = FontFamily(Font(R.font.impact)),
-            context = LocalContext.current,
-            modelId = 1
-        )
-    }
-}*/
-
 @Preview
 @Composable
 fun PreviewModelChanger() {
@@ -716,3 +849,4 @@ fun PreviewModelChanger() {
         ChangeModel()
     }
 }
+
