@@ -87,8 +87,6 @@ fun InfoScreen(
     id: Int,
     context: Context,
     navController: NavController
-    //swipeableViewModel: SwipeableViewModel,
-    //screenStackIndex: Int
 ) {
     val model = FakeDatabase().getModelFromID(id).toModel()
     var readMore by rememberSaveable {

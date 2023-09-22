@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,10 +13,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -50,13 +52,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.model.FakeDatabase
+import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.toModel
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
 
@@ -306,7 +308,7 @@ fun Transaction(
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                Row() {
+                                Row {
                                     Text(
                                         text ="Balance: 0.015",
                                         style = TextStyle(
@@ -363,7 +365,7 @@ fun Transaction(
                                     mutableIntStateOf(15)
                                 }
                                 Image(
-                                    painter = painterResource(id = model.imageId),
+                                    painter = painterResource(id = R.drawable.baraka_obama),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .size(25.dp)
@@ -372,7 +374,7 @@ fun Transaction(
 
                                 )
                                 Text(
-                                    text = " ${model.name}",
+                                    text = " Baraka Obama",
                                     style = TextStyle(
                                         color = primaryColor
                                     ),
@@ -386,7 +388,7 @@ fun Transaction(
                                     }
                                 )
                                 Image(
-                                    painter = painterResource(id = R.drawable.point_back),
+                                    painter = painterResource(id = R.drawable.point_back_bright),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .rotate(180f)
@@ -468,6 +470,7 @@ fun getRawMoneyNumber(
         ""
     }
 }
+
 @Composable
 fun NumberPanel(
     value: String,
@@ -499,6 +502,189 @@ fun NumberPanel(
         )
     }
 }
+
+@Composable
+fun ChangeModel() {
+    val configuration = LocalConfiguration.current
+    val defaultOffset = configuration.screenHeightDp
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            //.offset(0.dp, defaultOffset.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color.Black)
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Canvas(
+                modifier = Modifier
+                    .width(50.dp)
+                ,
+            ) {                        
+                val canvasWidth = size.width
+
+                drawLine(
+                    start = Offset(x = canvasWidth, y = 0f),
+                    end = Offset(x = 0f, y = 0f),
+                    color = Color.Gray,
+                    strokeWidth = 7f
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(30.dp)
+                    .padding(
+                        start = 8.dp,
+                        end = 8.dp
+                    ),
+                colors = CardDefaults.cardColors(
+                    contentColor = Color.DarkGray,
+                    containerColor = Color.Gray,
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                    .fillMaxSize(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(
+                        text = "Search tokens"
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ModelOption(
+    model: Model
+) {
+    val primaryTextColor = colorResource(id = R.color.teal_200)
+    val secondaryTextColor = colorResource(id = R.color.teal_700)
+    val textFont = FontFamily(Font(R.font.impact))
+    val topFontSize = 16.sp
+    val bottomFontSize = 14.sp
+
+    Surface(
+        modifier = Modifier
+            .clickable {
+            }
+            .height(75.dp)
+            .fillMaxWidth()
+            .background(Color.Black),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.background(Color.Black)
+        ) {
+            Image(
+                painter = painterResource(id = model.imageId),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center,
+                modifier = Modifier
+                    .size(50.dp)
+                    .padding(5.dp)
+                    .clip(CircleShape)
+            )
+
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row() {
+                    Text(
+                        text = model.name,
+                        fontSize = topFontSize,
+                        style = TextStyle(
+                            color = primaryTextColor
+                        ),
+                        fontFamily = textFont
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(3.dp))
+
+                Text(
+                    text = model.description,
+                    fontSize = bottomFontSize,
+                    style = TextStyle(
+                        color = secondaryTextColor
+                    ),
+                    fontFamily = textFont
+                )
+            }
+
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(end = 10.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        modifier = Modifier.padding(end = 3.dp)
+                    ) {
+                        Text(
+                            text = "$${model.current}",
+                            textAlign = TextAlign.End,
+                            style = TextStyle(
+                                color = primaryTextColor
+                            ),
+                            fontFamily = textFont,
+                            fontSize = topFontSize
+                        )
+
+                        Spacer(modifier = Modifier.height(3.dp))
+
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Image(
+                                painter = painterResource(
+                                    id = if(model.positiveGrowth) R.drawable.up else R.drawable.down),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(8.dp),
+                                contentScale = ContentScale.FillBounds
+                            )
+
+                            Spacer(modifier = Modifier.width(4.dp))
+
+                            Text(
+                                text = "${model.growthPercent}%",
+                                style = TextStyle(
+                                    color = secondaryTextColor
+                                ),
+                                fontFamily = textFont,
+                                fontSize = bottomFontSize
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun PreviewTransaction() {
@@ -511,7 +697,7 @@ fun PreviewTransaction() {
     }
 }
 
-@Preview
+/*@Preview
 @Composable
 fun PreviewTransaction2() {
     UiAssignmentSeptemberTheme {
@@ -521,5 +707,12 @@ fun PreviewTransaction2() {
             modelId = 1
         )
     }
-}
+}*/
 
+@Preview
+@Composable
+fun PreviewModelChanger() {
+    UiAssignmentSeptemberTheme {
+        ChangeModel()
+    }
+}
