@@ -390,6 +390,7 @@ fun InfoScreen(
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(22.dp)
+                                    .clickable{navController.navigate("transaction/${model.id}")}
                             )
 
                             Spacer(modifier = Modifier.width(5.dp))

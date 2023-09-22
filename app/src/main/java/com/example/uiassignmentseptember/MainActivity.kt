@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.uiassignmentseptember.compose.HomeScreen
 import com.example.uiassignmentseptember.compose.InfoScreen
+import com.example.uiassignmentseptember.compose.Transaction
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -86,6 +89,33 @@ fun App(navController: NavHostController,context: Context) {
                 context,
                 navController
                 )
+        }
+
+        composable(
+            route = "transaction/{id}",
+            arguments = listOf(
+                navArgument(name = "id") {
+                    type = NavType.IntType
+                }
+            ),
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(animationTime)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(animationTime)
+                )
+            }
+        ) {
+            it.arguments?.let { it1 ->
+                Transaction(
+                    textFont = FontFamily(Font(R.font.impact)),
+                    context = context, modelId = it1.getInt("id"))
+            }
         }
     }
 }
