@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -489,11 +490,12 @@ fun InfoScreen(
                     )
 
                     Row(
-                        modifier = Modifier.scrollable(
-                            linksScrollState,
-                            orientation = Orientation.Horizontal
-                        )
+                        modifier = Modifier.horizontalScroll(linksScrollState)
                     ) {
+                        Links(imageId = R.drawable.internet_icon, text = "Website")
+                        Links(imageId = R.drawable.facebook_icon, text = "Facebook")
+                        Links(imageId = R.drawable.youtube_icon, text = "Youtube")
+                        Links(imageId = R.drawable.twitter_icon, text = "Twitter")
                         Links(imageId = R.drawable.internet_icon, text = "Website")
                         Links(imageId = R.drawable.facebook_icon, text = "Facebook")
                         Links(imageId = R.drawable.youtube_icon, text = "Youtube")
@@ -731,13 +733,18 @@ fun Links(
     imageId: Int,
     text: String
 ) {
+    Spacer(modifier = Modifier.width(4.dp))
+
+    //var containerWidth by rememberSaveable { mutableStateOf(80) }
     Card(
-        modifier = Modifier.width(80.dp),
+        modifier = Modifier.width(75.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.DarkGray
         )
     ) {
-        Row {
+        Row(
+            modifier = Modifier.padding(2.dp)
+        ) {
             Image(
                 painter = painterResource(id = imageId),
                 contentDescription = null,
@@ -745,8 +752,8 @@ fun Links(
                 alignment = Alignment.Center,
                 modifier = Modifier
                     .size(20.dp)
-                    .padding(1.dp)
                     .clip(CircleShape)
+                    .padding(2.dp)
             )
 
             Text(
@@ -757,11 +764,17 @@ fun Links(
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.impact)),
                 maxLines = 1,
-                overflow = TextOverflow.Clip
+                overflow = TextOverflow.Clip,
+                /*onTextLayout = { textLayoutResult ->
+                    if (!textLayoutResult.didOverflowWidth) {
+                        containerWidth -= 1
+                    }
+                }*/
             )
         }
-
     }
+
+    Spacer(modifier = Modifier.width(4.dp))
 }
 
 fun generateAXisX(
