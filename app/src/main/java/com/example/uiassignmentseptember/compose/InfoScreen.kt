@@ -89,14 +89,14 @@ fun InfoScreen(
     navController: NavController
 ) {
     val model = FakeDatabase().getModelFromID(id).toModel()
-    var readMore by rememberSaveable {
+    var readMore by remember {
         mutableStateOf(false)
     }
     val offsetX by remember { mutableFloatStateOf(0f) }
     val screenScrollState = rememberScrollState()
     val linksScrollState = rememberScrollState()
 
-    var isFavorite by rememberSaveable {
+    var isFavorite by remember {
         mutableStateOf(false)
     }
     val topIconSize = 20.dp
@@ -511,7 +511,7 @@ fun Graph(
     model: Model,
     context: Context
 ) {
-    var currentOutPut by rememberSaveable {
+    var currentOutPut by remember {
         mutableStateOf(GraphOutputType.WEEK)
     }
 

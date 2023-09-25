@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -62,6 +63,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.getTokenOffset
 import com.example.uiassignmentseptember.model.FakeDatabase
@@ -702,30 +704,11 @@ fun ChangeModel(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                ModelOption(
-                    model = FakeDatabase().getModelFromID(1).toModel(),
-                    context = context
-                )
-
-                ModelOption(
-                    model = FakeDatabase().getModelFromID(2).toModel(),
-                    context = context
-                )
-
-                ModelOption(
-                    model = FakeDatabase().getModelFromID(3).toModel(),
-                    context = context
-                )
-
-                ModelOption(
-                    model = FakeDatabase().getModelFromID(4).toModel(),
-                    context = context
-                )
-
-                ModelOption(
-                    model = FakeDatabase().getModelFromID(5).toModel(),
-                    context = context
-                )
+                LazyColumn(){
+                    items(5) {
+                        ConstraintOption(model = FakeDatabase().getModelFromID(it).toModel(), context = context)
+                    }
+                }
             }
         }
     }
@@ -864,8 +847,108 @@ fun Token(
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-
             )
+    }
+}
+
+@Composable
+fun ConstraintOption(
+    model: Model,
+    context: Context
+) {
+    val primaryTextColor = colorResource(id = R.color.teal_200)
+    val secondaryTextColor = colorResource(id = R.color.teal_700)
+    val textFont = FontFamily(Font(R.font.impact))
+    val topFontSize = 16.sp
+    val bottomFontSize = 14.sp
+
+    ConstraintLayout(
+        modifier = Modifier
+            .height(75.dp)
+            .background(color = Color.Black)
+            .fillMaxWidth()
+            .clickable {
+                val intent = Intent("Change_activate")
+                intent.putExtra("change_activation_to", false)
+                context.sendBroadcast(intent)
+                val changeModel = Intent("change_model")
+                changeModel.putExtra("change_model_to", model.id)
+                context.sendBroadcast(changeModel)
+            }
+    ) {
+        val (image, name,money, num, description) = createRefs()
+
+        Image(
+            painter = painterResource(id = model.imageId),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.Center,
+            modifier = Modifier
+                .size(50.dp)
+                .padding(5.dp)
+                .clip(CircleShape)
+                .constrainAs(image) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
+        )
+
+        Text(
+            text = model.name,
+            fontSize = topFontSize,
+            style = TextStyle(
+                color = primaryTextColor
+            ),
+            fontFamily = textFont,
+            modifier = Modifier.constrainAs(name) {
+                start.linkTo(image.end)
+                top.linkTo(parent.top, margin = 5.dp)
+                bottom.linkTo(description.top)
+            }
+        )
+
+        Text(
+            text = "$${model.current}",
+            style = TextStyle(
+                color = secondaryTextColor
+            ),
+            fontFamily = textFont,
+            fontSize = bottomFontSize,
+            modifier = Modifier.constrainAs(money) {
+                end.linkTo(parent.end, margin = 10.dp)
+                top.linkTo(num.bottom)
+                bottom.linkTo(parent.bottom, margin = 5.dp)
+            }
+        )
+
+        Text(
+            text = model.description,
+            fontSize = bottomFontSize,
+            style = TextStyle(
+                color = secondaryTextColor
+            ),
+            fontFamily = textFont,
+            modifier = Modifier.constrainAs(description) {
+                start.linkTo(image.end)
+                bottom.linkTo(parent.bottom, margin = 5.dp)
+                top.linkTo(name.bottom)
+            }
+        )
+
+        Text(
+            text = getRawMoneyNumber(model.current.toString()),
+            textAlign = TextAlign.End,
+            style = TextStyle(
+                color = primaryTextColor
+            ),
+            fontFamily = textFont,
+            fontSize = topFontSize,
+            modifier = Modifier.constrainAs(num) {
+                end.linkTo(parent.end, margin = 10.dp)
+                top.linkTo(parent.top, margin = 5.dp)
+                bottom.linkTo(money.top)
+            }
+        )
     }
 }
 
@@ -896,5 +979,13 @@ fun PreviewModelChanger() {
 fun PreviewModelSelecter() {
     UiAssignmentSeptemberTheme {
         ModelOption(model = FakeDatabase().getModelFromID(2).toModel(), context = LocalContext.current)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewContraint() {
+    UiAssignmentSeptemberTheme {
+        ConstraintOption(FakeDatabase().getModelFromID(1).toModel(), LocalContext.current)
     }
 }
