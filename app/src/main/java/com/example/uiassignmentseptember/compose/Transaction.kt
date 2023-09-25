@@ -22,9 +22,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -61,6 +63,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uiassignmentseptember.R
+import com.example.uiassignmentseptember.getTokenOffset
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.toModel
@@ -82,6 +85,7 @@ fun Transaction(
     }
     val listOfInput = listOf("1","2","3","4","5","6","7","8","9",".","0","←")
     val singleDigitNum = listOf("0","1","2","3","4","5","6","7","8","9")
+
     DisposableEffect(sendingMoney) {
         val moneyBroadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
@@ -496,7 +500,7 @@ fun getRawMoneyNumber(
 ): String {
     val valueAsNum = value.toDouble()
     return if (valueAsNum > 0) {
-        ((value.toDouble() * 10) * (value.toDouble() * 10)).toString()
+        (value.toDouble() * 12).toString()
     } else {
         ""
     }
@@ -544,8 +548,6 @@ fun ChangeModel(
     var offset by rememberSaveable {
         mutableIntStateOf(configuration.screenHeightDp / 2)
     }
-
-    val primaryColor = colorResource(id = R.color.teal_200)
     val secondaryColor = colorResource(id = R.color.teal_700)
     val textFont = FontFamily(Font(R.font.impact))
     val listOfTokenImageId = listOf(
@@ -678,35 +680,11 @@ fun ChangeModel(
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Token(
-                            imageId = listOfTokenImageId[0],
-                            offsetX = 25
-                        )
-
-                        Token(
-                            imageId = listOfTokenImageId[1],
-                            offsetX = 20
-                        )
-
-                        Token(
-                            imageId = listOfTokenImageId[2],
-                            offsetX = 15
-                        )
-
-                        Token(
-                            imageId = listOfTokenImageId[3],
-                            offsetX = 10
-                        )
-
-                        Token(
-                            imageId = listOfTokenImageId[4],
-                            offsetX = 5
-                        )
-
-                        Token(
-                            imageId = listOfTokenImageId[5],
-                            offsetX = 0
-                        )
+                        LazyRow() {
+                            items(listOfTokenImageId) {
+                                Token(imageId = it)
+                            }
+                        }
 
                         Spacer(modifier = Modifier.width(8.dp))
 
@@ -870,13 +848,12 @@ fun ModelOption(
 
 @Composable
 fun Token(
-    imageId:Int,
-    offsetX:Int
+    imageId:Int
 ) {
     Card(
         modifier = Modifier
             .size(16.dp)
-            .offset(x = offsetX.dp),
+            .offset(x = getTokenOffset(imageId).dp),
         border = BorderStroke(
             width = 1.dp,
             color = colorResource(id = R.color.teal_200)
@@ -890,7 +867,6 @@ fun Token(
 
             )
     }
-
 }
 
 /*@Preview

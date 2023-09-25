@@ -422,7 +422,7 @@ fun InfoScreen(
                     Spacer(modifier = Modifier.height(9.dp))
 
                     Text(
-                        text = model.detail,
+                        text = FakeDatabase().getDetailFromId(model.id),
                         maxLines = if (readMore) Int.MAX_VALUE else 3,
                         overflow = TextOverflow.Ellipsis,
                         style = TextStyle(color = Color.White),

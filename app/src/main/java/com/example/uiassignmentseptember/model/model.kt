@@ -14,7 +14,6 @@ data class Model(
     val positiveGrowth:Boolean,
     val description: String,
     val imageId: Int,
-    val detail: String,
     val pointData: List<Point>,
     val chartColor: Color
 )
@@ -26,7 +25,6 @@ fun Model?.toModel(): Model = Model(
     this.positiveGrowth,
     this.description,
     this.imageId,
-    this.detail,
     this.pointData,
     this.chartColor
 )
