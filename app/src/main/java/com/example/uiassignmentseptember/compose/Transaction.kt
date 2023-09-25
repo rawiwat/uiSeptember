@@ -511,6 +511,8 @@ fun NumberPanel(
 ) {
     val configuration = LocalConfiguration.current
     val width = configuration.screenWidthDp / 3
+    val height = configuration.screenHeightDp / 8
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -521,7 +523,7 @@ fun NumberPanel(
                 context.sendBroadcast(intent)
             }
             .width(width.dp)
-            .height((width / 1.5).dp)
+            .height(height.dp)
     ) {
         Text(
             text = value,
@@ -769,7 +771,7 @@ fun ModelOption(
                 intent.putExtra("change_activation_to", false)
                 context.sendBroadcast(intent)
                 val changeModel = Intent("change_model")
-                changeModel.putExtra("change_model_to",model.id)
+                changeModel.putExtra("change_model_to", model.id)
                 context.sendBroadcast(changeModel)
             }
             .height(75.dp)
@@ -796,7 +798,7 @@ fun ModelOption(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
-                Row() {
+                Row {
                     Text(
                         text = model.name,
                         fontSize = topFontSize,
@@ -835,7 +837,7 @@ fun ModelOption(
                         modifier = Modifier.padding(end = 3.dp)
                     ) {
                         Text(
-                            text = "$${model.current}",
+                            text = getRawMoneyNumber(model.current.toString()),
                             textAlign = TextAlign.End,
                             style = TextStyle(
                                 color = primaryTextColor
@@ -850,19 +852,8 @@ fun ModelOption(
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Image(
-                                painter = painterResource(
-                                    id = if(model.positiveGrowth) R.drawable.up else R.drawable.down),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(8.dp),
-                                contentScale = ContentScale.FillBounds
-                            )
-
-                            Spacer(modifier = Modifier.width(4.dp))
-
                             Text(
-                                text = "${model.growthPercent}%",
+                                text = "$${model.current}",
                                 style = TextStyle(
                                     color = secondaryTextColor
                                 ),
@@ -902,7 +893,7 @@ fun Token(
 
 }
 
-@Preview
+/*@Preview
 @Composable
 fun PreviewTransaction() {
     UiAssignmentSeptemberTheme {
@@ -922,5 +913,12 @@ fun PreviewModelChanger() {
             LocalContext.current
         )
     }
-}
+}*/
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewModelSelecter() {
+    UiAssignmentSeptemberTheme {
+        ModelOption(model = FakeDatabase().getModelFromID(2).toModel(), context = LocalContext.current)
+    }
+}
