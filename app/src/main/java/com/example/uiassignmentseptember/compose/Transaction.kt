@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
@@ -44,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -573,15 +575,15 @@ fun ChangeModel(
     )
 
     var active by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     DisposableEffect(active) {
         val activationReceiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
                 val activationReceived = p1!!.getBooleanExtra("change_activation_to", false)
-                offset = (configuration.screenHeightDp / 2)
                 active = activationReceived
+                offset = (configuration.screenHeightDp / 2)
             }
         }
         context.registerReceiver(
@@ -596,13 +598,14 @@ fun ChangeModel(
 
     AnimatedVisibility(
         visible = active,
-        /*
         enter = slideInVertically(
-            initialOffsetY = { configuration.screenHeightDp }
+            initialOffsetY = { configuration.screenHeightDp },
+            animationSpec = tween(1000)
         ),
         exit = slideOutVertically(
-            targetOffsetY = { configuration.screenHeightDp }
-        )*/
+            targetOffsetY = { configuration.screenHeightDp },
+            animationSpec = tween(1000)
+        )
     ) {
         Surface(
             modifier = Modifier
@@ -634,21 +637,7 @@ fun ChangeModel(
                                     active = false
                                 }
                             }
-                        }
-                        /*.draggable(
-                            orientation = Orientation.Vertical,
-                            state = rememberDraggableState { delta ->
-                                offset += delta.toInt()
-                                if (offset < 0) {
-                                    offset = 0
-                                }
-
-                                if (offset >= (configuration.screenHeightDp * 3 / 4)) {
-                                    offset = (configuration.screenHeightDp / 2)
-                                    active = false
-                                }
-                            }
-                        )*/,
+                        },
                 ) {
                     val canvasWidth = size.width
 
@@ -716,8 +705,11 @@ fun ChangeModel(
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        LazyRow() {
-                            items(listOfTokenImageId) {
+                        LazyRow {
+                            items(
+                                listOfTokenImageId,
+                                key = { it }
+                            ) {
                                 Token(imageId = it)
                             }
                         }
@@ -898,7 +890,7 @@ fun ConstraintOption(
     val textFont = FontFamily(Font(R.font.impact))
     val topFontSize = 16.sp
     val bottomFontSize = 14.sp
-
+    val number = getRawMoneyNumber(model.current.toString())
     ConstraintLayout(
         modifier = Modifier
             .height(75.dp)
@@ -973,7 +965,7 @@ fun ConstraintOption(
         )
 
         Text(
-            text = getRawMoneyNumber(model.current.toString()),
+            text = number,
             textAlign = TextAlign.End,
             style = TextStyle(
                 color = primaryTextColor
