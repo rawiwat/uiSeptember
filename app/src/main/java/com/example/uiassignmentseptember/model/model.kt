@@ -1,11 +1,14 @@
 package com.example.uiassignmentseptember.model
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.model.LineChartData
+import com.example.uiassignmentseptember.GraphOutputType
 
+@Immutable
 data class Model(
     val id:Int,
     val name: String,
@@ -29,7 +32,7 @@ fun Model?.toModel(): Model = Model(
     this.chartColor
 )
 
-data class NavigationUIState(
+/*data class NavigationUIState(
     //--Back Stack for navigation--
     val navigationBackStack: SnapshotStateList<AppScreenTypes> = mutableStateListOf(AppScreenTypes.Screen1()),
 
@@ -45,4 +48,14 @@ data class NavigationUIState(
 sealed class AppScreenTypes(val route: String, args: String? = null){
     class Screen1(args: String? = null): AppScreenTypes(route = "screen1", args = args)
     class Screen2(args: String? = null): AppScreenTypes(route = "screen1", args = args)
-}
+}*/
+
+data class GraphSelector(
+    val type: GraphOutputType,
+    val text: String
+)
+
+data class StatsModel(
+    val name: String,
+
+)

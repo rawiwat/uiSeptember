@@ -60,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -75,6 +76,10 @@ import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import com.example.uiassignmentseptember.GraphOutputType
 import com.example.uiassignmentseptember.R
+import com.example.uiassignmentseptember.generateAXisX
+import com.example.uiassignmentseptember.generateAxisY
+import com.example.uiassignmentseptember.getAxisXStepSize
+import com.example.uiassignmentseptember.getPointData
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.toModel
@@ -108,97 +113,66 @@ fun InfoScreen(
 
     Scaffold(
         topBar = {
-            Surface(
+            ConstraintLayout(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(100.dp)
                     .background(color = Color.Black)
-                    .height(50.dp)
             ) {
-                Row(
+                val (three_dots,arrow,fav,name,icon,money) = createRefs()
+
+                Image(
+                    painter = painterResource(id = R.drawable.point_back),
+                    contentDescription = null,
                     modifier = Modifier
-                        .background(color = Color.Black),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Image(
-                        painter = painterResource(id = R.drawable.point_back),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .clickable { navController.navigate("Home") }
-                            .size(topIconSize)
-                    )
-                }
-
-                if(screenScrollState.value >= 280) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = Color.Transparent),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "$${model.current}",
-                            style = TextStyle(
-                                color = primaryColor
-                            ),
-                            fontFamily = textFont,
-                            fontSize = 16.sp
-                        )
-                        Row() {
-                            Image(
-                                painter = painterResource(id = model.imageId),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(22.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-
-                            Spacer(modifier = Modifier.width(2.dp))
-
-                            Text(
-                                text = model.name,
-                                style = TextStyle(
-                                    color = secondaryColor
-                                ),
-                                fontSize = 13.sp,
-                                fontFamily = textFont
-                            )
+                        .clickable { navController.navigate("Home") }
+                        .size(topIconSize)
+                        .constrainAs(arrow) {
+                            start.linkTo(parent.start, margin = 15)
                         }
-                    }
-                }
+                )
 
-                Row(
+                Image(
+                    painter = painterResource(
+                        id = if (isFavorite) {
+                            R.drawable.fav_is_selected
+                        } else { R.drawable.fav_not_selected }
+                    ),
+                    contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = Color.Transparent),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.three_dots),
-                        contentDescription = null,
-                        modifier = Modifier.size(topIconSize)
-                    )
+                        .clickable { isFavorite = !isFavorite }
+                        .size(topIconSize)
+                        .constrainAs(fav) {
 
-                    Spacer(modifier = Modifier.width(15.dp))
+                        }
+                )
 
-                    Image(
-                        painter = painterResource(
-                            id = if (isFavorite) {
-                                R.drawable.fav_is_selected
-                            } else { R.drawable.fav_not_selected }
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .clickable { isFavorite = !isFavorite }
-                            .size(topIconSize)
-                    )
+                Text(
+                    text = "$${model.current}",
+                    style = TextStyle(
+                        color = primaryColor
+                    ),
+                    fontFamily = textFont,
+                    fontSize = 16.sp,
+                    modifier = Modifier.constrainAs(money) {
 
-                    Spacer(modifier = Modifier.width(15.dp))
+                    }
+                )
 
-                }
+                Image(
+                    painter = painterResource(id = model.imageId),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(22.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.three_dots),
+                    contentDescription = null,
+                    modifier = Modifier.size(topIconSize)
+                )
             }
         },
         bottomBar = {
@@ -776,53 +750,6 @@ fun Links(
     Spacer(modifier = Modifier.width(4.dp))
 }
 
-fun generateAXisX(
-    pointsData: List<Point>,
-    stepSize: Int,
-    axisPadding: Int
-): AxisData {
-    return AxisData.Builder()
-        .axisStepSize(stepSize.dp)
-        .backgroundColor(Color.Black)
-        .steps(pointsData.size - 1)
-        .labelData { i -> i.toString() }
-        .labelAndAxisLinePadding(axisPadding.dp)
-        .build()
-}
-
-fun generateAxisY(
-    stepSize: Int,
-    axisPadding: Int
-):AxisData {
-    return AxisData.Builder()
-        .steps(stepSize)
-        .backgroundColor(Color.Black)
-        .labelAndAxisLinePadding(axisPadding.dp)
-        .labelData { i ->
-            val yScale = 100 / stepSize
-            (i * yScale).toString()
-        }.build()
-}
-
-fun getAxisXStepSize(type: GraphOutputType) :Int {
-    return when(type) {
-        GraphOutputType.HOUR -> 75
-        GraphOutputType.DAY -> 50
-        GraphOutputType.WEEK -> 25
-        GraphOutputType.MONTH -> 10
-        GraphOutputType.YEAR -> 3
-    }
-}
-
-fun getPointData(type: GraphOutputType, fullData:List<Point>):List<Point> {
-    return when(type) {
-        GraphOutputType.HOUR -> fullData.subList(0,8)
-        GraphOutputType.DAY -> fullData.subList(0,12)
-        GraphOutputType.WEEK -> fullData.subList(0,24)
-        GraphOutputType.MONTH -> fullData.subList(0,60)
-        GraphOutputType.YEAR -> fullData.subList(0,200)
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

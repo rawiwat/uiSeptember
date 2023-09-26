@@ -3,9 +3,6 @@ package com.example.uiassignmentseptember.model
 import androidx.compose.ui.graphics.Color
 import co.yml.charts.common.model.Point
 import com.example.uiassignmentseptember.R
-import com.example.uiassignmentseptember.compose.generateAXisX
-import com.example.uiassignmentseptember.compose.generateAxisY
-import com.example.uiassignmentseptember.compose.generateChartData
 import kotlin.random.Random
 
 class FakeDatabase {

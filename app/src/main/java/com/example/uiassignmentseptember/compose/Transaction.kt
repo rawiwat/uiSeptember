@@ -10,7 +10,10 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -105,8 +108,10 @@ fun Transaction(
                         } else if (received == ".") {
                             if (sendingMoney.contains(".")) {
                                 sendingMoney.replace(".","")
+                                sendingMoney += "."
+                            } else {
+                                sendingMoney += "."
                             }
-                            sendingMoney += "."
                         } else if (received == "←") {
                             if (sendingMoney.length >= 2) {
                                 sendingMoney = sendingMoney.substring(0,sendingMoney.length - 1)
@@ -547,9 +552,7 @@ fun ChangeModel(
     context:Context
 ) {
     val configuration = LocalConfiguration.current
-    var offset by rememberSaveable {
-        mutableIntStateOf(configuration.screenHeightDp / 2)
-    }
+    var offset by remember { mutableIntStateOf(configuration.screenHeightDp / 2) }
     val secondaryColor = colorResource(id = R.color.teal_700)
     val textFont = FontFamily(Font(R.font.impact))
     val listOfTokenImageId = listOf(
@@ -614,7 +617,21 @@ fun ChangeModel(
                                     active = false
                                 }
                             }
-                        },
+                        }
+                        /*.draggable(
+                            orientation = Orientation.Vertical,
+                            state = rememberDraggableState { delta ->
+                                offset += delta.toInt()
+                                if (offset < 0) {
+                                    offset = 0
+                                }
+
+                                if (offset >= (configuration.screenHeightDp * 3 / 4)) {
+                                    offset = (configuration.screenHeightDp / 2)
+                                    active = false
+                                }
+                            }
+                        )*/,
                 ) {
                     val canvasWidth = size.width
 
@@ -705,8 +722,11 @@ fun ChangeModel(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 LazyColumn(){
-                    items(5) {
-                        ConstraintOption(model = FakeDatabase().getModelFromID(it).toModel(), context = context)
+                    items(
+                        FakeDatabase().getFakeData(),
+                        key = { it.id }
+                    ) {
+                        ConstraintOption(model = it, context = context)
                     }
                 }
             }

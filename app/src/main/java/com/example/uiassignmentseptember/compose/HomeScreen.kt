@@ -13,14 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,13 +46,9 @@ import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    //screenStackIndex: Int,
-    //swipeableViewModel: SwipeableViewModel
+    navController: NavController
 ) {
-    val dataList by rememberSaveable {
-        mutableStateOf(FakeDatabase().getFakeData())
-    }
+    val dataList = FakeDatabase().getFakeData()
 
     val scrollState = rememberScrollState()
 
@@ -68,11 +64,10 @@ fun HomeScreen(
                 .height(1000.dp)
                 .background(Color.Black),
             horizontalAlignment = Alignment.CenterHorizontally,) {
-            for (data in dataList) {
-                Selector(
-                    data, //swipeableViewModel
-                    navController
-                )
+            LazyColumn {
+                items(dataList,key = { it.id }) {
+                    ConstraintSelector(model = it, navController = navController)
+                }
             }
         }
     }
@@ -82,7 +77,6 @@ fun HomeScreen(
 @Composable
 fun Selector(
     model: Model,
-    //swipeableViewModel: SwipeableViewModel
     navController: NavController
 ) {
     val primaryTextColor = colorResource(id = R.color.teal_200)
@@ -95,7 +89,6 @@ fun Selector(
         modifier = Modifier
             .clickable {
                 navController.navigate("infoScreen/${model.id}")
-                //swipeableViewModel.pushToBackStack(AppScreenTypes.Screen2())
             }
             .height(75.dp)
             .fillMaxWidth()
@@ -121,7 +114,7 @@ fun Selector(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
-                Row() {
+                Row {
                     Text(
                         text = model.name,
                         fontSize = topFontSize,
@@ -203,41 +196,38 @@ fun Selector(
 }
 
 @Composable
-fun ConstraintSelector(model: Model) {
+fun ConstraintSelector(
+    model: Model,
+    navController: NavController
+) {
+    val primaryTextColor = colorResource(id = R.color.teal_200)
+    val secondaryTextColor = colorResource(id = R.color.teal_700)
+    val textFont = FontFamily(Font(R.font.impact))
+    val topFontSize = 16.sp
+    val bottomFontSize = 14.sp
+
     ConstraintLayout(
-        modifier = Modifier.background(Color.Black)
+        modifier = Modifier
+            .height(75.dp)
+            .background(color = Color.Black)
+            .fillMaxWidth()
+            .clickable { navController.navigate("infoScreen/${model.id}") }
     ) {
-
-        val (image, name,description,money,percent,growthIcon,background) = createRefs()
-        val primaryTextColor = colorResource(id = R.color.teal_200)
-        val secondaryTextColor = colorResource(id = R.color.teal_700)
-        val textFont = FontFamily(Font(R.font.impact))
-        val topFontSize = 16.sp
-        val bottomFontSize = 14.sp
-
-        Surface(
-            modifier = Modifier
-                .constrainAs(background) {
-                }
-                .background(Color.Black)
-                .fillMaxWidth()
-                .height(75.dp)
-        ) {
-        }
+        val (image, name,money, growth, description, percent) = createRefs()
 
         Image(
-            painterResource(id = model.imageId),
+            painter = painterResource(id = model.imageId),
             contentDescription = null,
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.Center,
             modifier = Modifier
-                .constrainAs(image) {
-                    start.linkTo(background.start)
-                    top.linkTo(background.top)
-                    bottom.linkTo(background.bottom)
-                }
                 .size(50.dp)
                 .padding(5.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop,
+                .clip(CircleShape)
+                .constrainAs(image) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
         )
 
         Text(
@@ -247,27 +237,11 @@ fun ConstraintSelector(model: Model) {
                 color = primaryTextColor
             ),
             fontFamily = textFont,
-            modifier = Modifier
-                .constrainAs(name) {
-                    start.linkTo(image.end)
-                    top.linkTo(background.top)
-                    bottom.linkTo(description.top)
-                }
-        )
-
-        Text(
-            text = model.description,
-            fontSize = bottomFontSize,
-            style = TextStyle(
-                color = secondaryTextColor
-            ),
-            fontFamily = textFont,
-            modifier = Modifier
-                .constrainAs(description) {
-                    start.linkTo(image.end)
-                    top.linkTo(name.bottom)
-                    bottom.linkTo(background.bottom)
-                }
+            modifier = Modifier.constrainAs(name) {
+                start.linkTo(image.end)
+                top.linkTo(parent.top, margin = 5.dp)
+                bottom.linkTo(description.top)
+            }
         )
 
         Text(
@@ -277,10 +251,39 @@ fun ConstraintSelector(model: Model) {
             ),
             fontFamily = textFont,
             fontSize = topFontSize,
-            modifier = Modifier
-                .constrainAs(money) {
-                    end.linkTo(background.end)
+            modifier = Modifier.constrainAs(money) {
+                top.linkTo(parent.top, margin = 5.dp)
+                end.linkTo(parent.end, margin = 12.dp)
+                bottom.linkTo(percent.top)
             }
+        )
+
+        Text(
+            text = model.description,
+            fontSize = bottomFontSize,
+            style = TextStyle(
+                color = secondaryTextColor
+            ),
+            fontFamily = textFont,
+            modifier = Modifier.constrainAs(description) {
+                start.linkTo(image.end)
+                bottom.linkTo(parent.bottom, margin = 5.dp)
+                top.linkTo(name.bottom)
+            }
+        )
+
+        Image(
+            painter = painterResource(
+                id = if(model.positiveGrowth) R.drawable.up else R.drawable.down),
+            contentDescription = null,
+            modifier = Modifier
+                .size(8.dp)
+                .constrainAs(growth) {
+                    end.linkTo(percent.start, margin = 5.dp)
+                    top.linkTo(percent.top)
+                    bottom.linkTo(percent.bottom)
+                },
+            contentScale = ContentScale.FillBounds
         )
 
         Text(
@@ -290,13 +293,15 @@ fun ConstraintSelector(model: Model) {
             ),
             fontFamily = textFont,
             fontSize = bottomFontSize,
-            modifier = Modifier
-                .constrainAs(money) {
-                    end.linkTo(background.end)
-                }
+            modifier = Modifier.constrainAs(percent) {
+                end.linkTo(parent.end, margin = 12.dp)
+                bottom.linkTo(parent.bottom, margin = 5.dp)
+                top.linkTo(money.bottom)
+            }
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -321,8 +326,9 @@ fun PreviewSelection() {
 fun ConstraintPreview() {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column {
-            ConstraintSelector(model = FakeDatabase().getModelFromID(1).toModel())
-            ConstraintSelector(model = FakeDatabase().getModelFromID(2).toModel())
+            val nav = NavController(LocalContext.current)
+            ConstraintSelector(model = FakeDatabase().getModelFromID(1).toModel(),nav)
+            ConstraintSelector(model = FakeDatabase().getModelFromID(2).toModel(),nav)
         }
     }
 
