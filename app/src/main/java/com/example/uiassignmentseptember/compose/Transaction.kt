@@ -489,7 +489,10 @@ fun Transaction(
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     content = {
-                        items(listOfInput) {
+                        items(
+                            listOfInput,
+                            key = { it }
+                        ) {
                             NumberPanel(
                                 value = it,
                                 context = context,
@@ -983,7 +986,7 @@ fun ConstraintOption(
     }
 }
 
-/*@Preview
+@Preview
 @Composable
 fun PreviewTransaction() {
     UiAssignmentSeptemberTheme {
@@ -1003,7 +1006,7 @@ fun PreviewModelChanger() {
             LocalContext.current
         )
     }
-}*/
+}
 
 @Preview(showBackground = true)
 @Composable
