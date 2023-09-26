@@ -360,14 +360,22 @@ fun InfoScreen(
             Graph(
                 model = model, context
             )
-            Column(
+
+            Spacer(modifier = Modifier.height(9.dp))
+
+            ConstraintLayout(
                 modifier = Modifier
             ) {
-                Spacer(modifier = Modifier.height(9.dp))
-
+                val (
+                    line1, line2, yourBalance,
+                    yourMoney, send, detailText
+                ) = createRefs()
                 Canvas(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .constrainAs(line1) {
+                            top.linkTo(parent.top)
+                        }
                 ) {
                     val canvasWidth = size.width
                     val canvasHeight = size.height
@@ -378,50 +386,29 @@ fun InfoScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(9.dp))
-
                 Text(
                     text = "Your balance",
                     style = TextStyle(
                         color = secondaryColor
                     ),
                     fontFamily = textFont,
-                    fontSize = bodyFontSize
+                    fontSize = bodyFontSize,
+                    modifier = Modifier.constrainAs(yourBalance) {
+                        top.linkTo(line1.bottom,margin = 8.dp)
+                    }
                 )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = Modifier
-                    ) {
-                        Text(
-                            text = "$4.20",
-                            style = TextStyle(
-                                color = Color.White
-                            ),
-                            fontFamily = textFont,
-                            fontSize = bodyFontSize
-                        )
+                Text(
+                    text = "$4.20",
+                    style = TextStyle(
+                        color = Color.White
+                    ),
+                    fontFamily = textFont,
+                    fontSize = bodyFontSize,
+                    modifier = Modifier.constrainAs(yourMoney) {
+                        top.linkTo(yourBalance.bottom)
                     }
-
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.share_plane),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(22.dp)
-                                .clickable { navController.navigate("transaction/${model.id}") }
-                        )
-
-                        Spacer(modifier = Modifier.width(5.dp))
-                    }
-                }
+                )
 
                 Text(
                     text = "1.8.2 Lime",
@@ -429,14 +416,32 @@ fun InfoScreen(
                         color = secondaryColor
                     ),
                     fontFamily = textFont,
-                    fontSize = bodyFontSize
+                    fontSize = bodyFontSize,
+                    modifier = Modifier.constrainAs(detailText) {
+                        top.linkTo(yourMoney.bottom)
+                    }
                 )
 
-                Spacer(modifier = Modifier.height(9.dp))
+                Image(
+                    painter = painterResource(R.drawable.share_plane),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(22.dp)
+                        .clickable { navController.navigate("transaction/${model.id}") }
+                        .constrainAs(send) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            end.linkTo(parent.end,margin = 8.dp)
+                        }
+                )
 
                 Canvas(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .constrainAs(line2) {
+                            bottom.linkTo(parent.bottom)
+                            top.linkTo(detailText.bottom,margin = 8.dp)
+                        }
                 ) {
                     val canvasWidth = size.width
                     val canvasHeight = size.height
@@ -502,7 +507,7 @@ fun InfoScreen(
             )
 
             LazyRow(
-                modifier = Modifier
+                modifier = Modifier.height(40.dp)
             ) {
                 items(
                     linkList,
@@ -511,8 +516,6 @@ fun InfoScreen(
                     Links(imageId = link.imageId, text = link.name)
                 }
             }
-
-
         }
     }
 }
@@ -550,9 +553,9 @@ fun Graph(
     Column {
         LineChart(
             modifier = Modifier
+                .background(color = Color.Black)
                 .fillMaxWidth()
                 .height(250.dp)
-                .background(color = Color.Black)
             ,
             lineChartData = generateChartData(
                 pointsData = getPointData(currentOutPut,model.pointData),
