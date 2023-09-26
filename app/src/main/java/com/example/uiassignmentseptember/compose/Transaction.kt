@@ -70,6 +70,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import coil.compose.AsyncImage
 import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.getTokenOffset
 import com.example.uiassignmentseptember.model.FakeDatabase
@@ -381,6 +382,7 @@ fun Transaction(
                         }
                     }
                 }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -408,8 +410,8 @@ fun Transaction(
                                 var thisFontSize by rememberSaveable {
                                     mutableIntStateOf(15)
                                 }
-                                Image(
-                                    painter = painterResource(id = R.drawable.baraka_obama),
+                                AsyncImage(
+                                    model = R.drawable.baraka_obama,
                                     contentDescription = null,
                                     modifier = Modifier
                                         .size(25.dp)
@@ -594,12 +596,13 @@ fun ChangeModel(
 
     AnimatedVisibility(
         visible = active,
+        /*
         enter = slideInVertically(
             initialOffsetY = { configuration.screenHeightDp }
         ),
         exit = slideOutVertically(
             targetOffsetY = { configuration.screenHeightDp }
-        )
+        )*/
     ) {
         Surface(
             modifier = Modifier
@@ -680,8 +683,8 @@ fun ChangeModel(
                     ) {
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        Image(
-                            painter = painterResource(id = R.drawable.search_icon),
+                        AsyncImage(
+                            model = R.drawable.search_icon,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )
@@ -721,8 +724,8 @@ fun ChangeModel(
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        Image(
-                            painter = painterResource(id = R.drawable.point_back),
+                        AsyncImage(
+                            model = R.drawable.point_back,
                             contentDescription = null,
                             modifier = Modifier
                                 .size(16.dp)
@@ -735,7 +738,7 @@ fun ChangeModel(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                LazyColumn(){
+                LazyColumn {
                     items(
                         FakeDatabase().getFakeData(),
                         key = { it.id }
@@ -876,8 +879,8 @@ fun Token(
             color = colorResource(id = R.color.teal_200)
         )
     ) {
-        Image(
-            painter = painterResource(id = imageId),
+        AsyncImage(
+            model = imageId,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
@@ -910,10 +913,10 @@ fun ConstraintOption(
                 context.sendBroadcast(changeModel)
             }
     ) {
-        val (image, name,money, num, description) = createRefs()
+        val (image, name, money, num, description) = createRefs()
 
-        Image(
-            painter = painterResource(id = model.imageId),
+        AsyncImage(
+            model = model.imageId,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             alignment = Alignment.Center,
