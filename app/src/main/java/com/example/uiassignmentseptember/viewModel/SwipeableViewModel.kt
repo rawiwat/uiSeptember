@@ -1,14 +1,12 @@
 package com.example.uiassignmentseptember.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.example.uiassignmentseptember.model.AppScreenTypes
-import com.example.uiassignmentseptember.model.NavigationUIState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+/*
 @HiltViewModel
 class SwipeableViewModel @Inject constructor() : ViewModel(){
 
@@ -95,4 +93,4 @@ class SwipeableViewModel @Inject constructor() : ViewModel(){
             }
         }
     }
-}
+}*/

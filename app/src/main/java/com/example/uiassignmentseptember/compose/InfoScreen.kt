@@ -24,6 +24,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -81,7 +84,9 @@ import com.example.uiassignmentseptember.generateAxisY
 import com.example.uiassignmentseptember.getAxisXStepSize
 import com.example.uiassignmentseptember.getPointData
 import com.example.uiassignmentseptember.model.FakeDatabase
+import com.example.uiassignmentseptember.model.LinkModel
 import com.example.uiassignmentseptember.model.Model
+import com.example.uiassignmentseptember.model.StatsModel
 import com.example.uiassignmentseptember.model.toModel
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
 import kotlin.math.roundToInt
@@ -110,16 +115,28 @@ fun InfoScreen(
     val textFont = FontFamily(Font(R.font.impact))
     val bodyFontSize = 14.sp
     val splitedMoney = model.current.toString().split(".")
+    val statsList = listOf(
+        StatsModel("Doritos","23.15M"),
+        StatsModel("Pringle","14.16M"),
+        StatsModel("Tarkis","16.75M"),
+        StatsModel("Lays","21.15M")
+    )
+    val linkList = listOf(
+        LinkModel(imageId = R.drawable.internet_icon, name = "Website"),
+        LinkModel(imageId = R.drawable.facebook_icon, name = "Facebook"),
+        LinkModel(imageId = R.drawable.youtube_icon, name = "Youtube"),
+        LinkModel(imageId = R.drawable.twitter_icon, name = "Twitter")
+    )
 
     Scaffold(
         topBar = {
             ConstraintLayout(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
+                    .height(50.dp)
                     .background(color = Color.Black)
             ) {
-                val (three_dots,arrow,fav,name,icon,money) = createRefs()
+                val (threeDots,arrow,fav,nameAndIcon,money) = createRefs()
 
                 Image(
                     painter = painterResource(id = R.drawable.point_back),
@@ -128,7 +145,9 @@ fun InfoScreen(
                         .clickable { navController.navigate("Home") }
                         .size(topIconSize)
                         .constrainAs(arrow) {
-                            start.linkTo(parent.start, margin = 15)
+                            start.linkTo(parent.start, margin = 15.dp)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
                         }
                 )
 
@@ -143,35 +162,69 @@ fun InfoScreen(
                         .clickable { isFavorite = !isFavorite }
                         .size(topIconSize)
                         .constrainAs(fav) {
-
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            end.linkTo(parent.end, margin = 15.dp)
                         }
                 )
 
-                Text(
-                    text = "$${model.current}",
-                    style = TextStyle(
-                        color = primaryColor
-                    ),
-                    fontFamily = textFont,
-                    fontSize = 16.sp,
-                    modifier = Modifier.constrainAs(money) {
+                if(screenScrollState.value >= 280) {
+                    Text(
+                        text = "$${model.current}",
+                        style = TextStyle(
+                            color = primaryColor
+                        ),
+                        fontFamily = textFont,
+                        fontSize = 16.sp,
+                        modifier = Modifier.constrainAs(money) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                    )
 
+                    Row(
+                      modifier = Modifier.constrainAs(nameAndIcon) {
+                          top.linkTo(money.bottom)
+                          start.linkTo(parent.start)
+                          end.linkTo(parent.end)
+                          bottom.linkTo(parent.bottom)
+                      }
+                    ) {
+                        Image(
+                            painter = painterResource(id = model.imageId),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(22.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Spacer(modifier = Modifier.width(3.dp))
+
+                        Text(
+                            text = model.name,
+                            style = TextStyle(
+                                color = secondaryColor
+                            ),
+                            fontFamily = textFont,
+                            fontSize = 13.sp,
+                            modifier = Modifier
+                        )
                     }
-                )
 
-                Image(
-                    painter = painterResource(id = model.imageId),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(22.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+                }
 
                 Image(
                     painter = painterResource(id = R.drawable.three_dots),
                     contentDescription = null,
-                    modifier = Modifier.size(topIconSize)
+                    modifier = Modifier
+                        .size(topIconSize)
+                        .constrainAs(threeDots) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            end.linkTo(fav.start, margin = 15.dp)
+                        }
                 )
             }
         },
@@ -250,7 +303,7 @@ fun InfoScreen(
                         fontSize = 13.sp
                     )
 
-                    Row() {
+                    Row {
                         Text(
                             text = "$${splitedMoney[0]}",
                             style = TextStyle(
@@ -362,7 +415,7 @@ fun InfoScreen(
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(22.dp)
-                                    .clickable{navController.navigate("transaction/${model.id}")}
+                                    .clickable { navController.navigate("transaction/${model.id}") }
                             )
 
                             Spacer(modifier = Modifier.width(5.dp))
@@ -427,29 +480,13 @@ fun InfoScreen(
                         fontFamily = textFont
                     )
 
-                    Stats(
-                        money = "23.15M",
-                        name = "Doritos",
-                        textFont = textFont
-                    )
-
-                    Stats(
-                        money = "14.16M",
-                        name = "Pringle",
-                        textFont = textFont
-                    )
-
-                    Stats(
-                        money = "16.75M",
-                        name = "Tarkis",
-                        textFont = textFont
-                    )
-
-                    Stats(
-                        money = "21.15M",
-                        name = "Lays",
-                        textFont = textFont
-                    )
+                    for (stats in statsList) {
+                        Stats(
+                            name = stats.name,
+                            money = stats.money,
+                            textFont = textFont
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -462,17 +499,12 @@ fun InfoScreen(
                         fontFamily = textFont
                     )
 
-                    Row(
+                    LazyRow(
                         modifier = Modifier.horizontalScroll(linksScrollState)
                     ) {
-                        Links(imageId = R.drawable.internet_icon, text = "Website")
-                        Links(imageId = R.drawable.facebook_icon, text = "Facebook")
-                        Links(imageId = R.drawable.youtube_icon, text = "Youtube")
-                        Links(imageId = R.drawable.twitter_icon, text = "Twitter")
-                        Links(imageId = R.drawable.internet_icon, text = "Website")
-                        Links(imageId = R.drawable.facebook_icon, text = "Facebook")
-                        Links(imageId = R.drawable.youtube_icon, text = "Youtube")
-                        Links(imageId = R.drawable.twitter_icon, text = "Twitter")
+                        items(linkList, key = {it.name}) {
+                            Links(imageId = it.imageId, text = it.name)
+                        }
                     }
                 }
             }

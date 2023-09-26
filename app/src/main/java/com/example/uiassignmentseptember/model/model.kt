@@ -49,13 +49,20 @@ sealed class AppScreenTypes(val route: String, args: String? = null){
     class Screen1(args: String? = null): AppScreenTypes(route = "screen1", args = args)
     class Screen2(args: String? = null): AppScreenTypes(route = "screen1", args = args)
 }*/
-
+@Immutable
 data class GraphSelector(
     val type: GraphOutputType,
     val text: String
 )
 
+@Immutable
 data class StatsModel(
     val name: String,
+    val money: String
+)
 
+@Immutable
+data class LinkModel(
+    val name: String,
+    val imageId: Int
 )

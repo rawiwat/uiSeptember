@@ -20,11 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
-import com.example.uiassignmentseptember.model.AppScreenTypes
-import com.example.uiassignmentseptember.viewModel.SwipeableViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
+/*
 @Composable
 fun HorizontalDraggableScreen(
     screenStackIndex: Int = 0,
@@ -82,7 +81,6 @@ fun HorizontalDraggableScreen(
     )
 }
 
-/*
 @Composable
 fun NavigationScreen(
     swipeableViewModel: SwipeableViewModel = SwipeableViewModel(),

@@ -331,5 +331,12 @@ fun ConstraintPreview() {
             ConstraintSelector(model = FakeDatabase().getModelFromID(2).toModel(),nav)
         }
     }
+}
 
+@Preview(showBackground = true)
+@Composable
+fun HomePreview() {
+    Surface(modifier = Modifier.fillMaxSize()) {
+        HomeScreen(navController = NavController(LocalContext.current))
+    }
 }
