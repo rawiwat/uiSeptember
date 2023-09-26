@@ -31,8 +31,8 @@ fun generateAXisX(
         .axisStepSize(stepSize.dp)
         .backgroundColor(androidx.compose.ui.graphics.Color.Black)
         .steps(pointsData.size - 1)
-        .labelData { i -> i.toString() }
-        .labelAndAxisLinePadding(axisPadding.dp)
+        //.labelData { i -> i.toString() }
+        //.labelAndAxisLinePadding(axisPadding.dp)
         .build()
 }
 
@@ -43,11 +43,12 @@ fun generateAxisY(
     return AxisData.Builder()
         .steps(stepSize)
         .backgroundColor(androidx.compose.ui.graphics.Color.Black)
-        .labelAndAxisLinePadding(axisPadding.dp)
-        .labelData { i ->
-            val yScale = 100 / stepSize
-            (i * yScale).toString()
-        }.build()
+        //.labelAndAxisLinePadding(axisPadding.dp)
+        //.labelData { i ->
+        //    val yScale = 100 / stepSize
+        //    (i * yScale).toString()
+        //}
+        .build()
 }
 
 fun getAxisXStepSize(type: GraphOutputType) :Int {

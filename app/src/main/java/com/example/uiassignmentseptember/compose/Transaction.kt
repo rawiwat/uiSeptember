@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -57,6 +59,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -586,7 +589,15 @@ fun ChangeModel(
         }
     }
 
-    AnimatedVisibility(visible = active) {
+    AnimatedVisibility(
+        visible = active,
+        enter = slideInVertically(
+            initialOffsetY = { configuration.screenHeightDp }
+        ),
+        exit = slideOutVertically(
+            targetOffsetY = { configuration.screenHeightDp }
+        )
+    ) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()

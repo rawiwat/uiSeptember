@@ -185,12 +185,4 @@ class FakeDatabase {
         }
     }
 
-    fun getStatsFromId(id: Int):StatsModel {
-        return when(id) {
-            0 -> StatsModel("Doritos","23.15M")
-            1 -> StatsModel("Pringle","14.16M")
-            2 -> StatsModel("Tarkis","16.75M")
-            else -> StatsModel("Lays","21.15M")
-        }
-    }
 }

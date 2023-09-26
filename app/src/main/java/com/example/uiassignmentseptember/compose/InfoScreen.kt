@@ -84,6 +84,7 @@ import com.example.uiassignmentseptember.generateAxisY
 import com.example.uiassignmentseptember.getAxisXStepSize
 import com.example.uiassignmentseptember.getPointData
 import com.example.uiassignmentseptember.model.FakeDatabase
+import com.example.uiassignmentseptember.model.GraphSelector
 import com.example.uiassignmentseptember.model.LinkModel
 import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.StatsModel
@@ -115,6 +116,7 @@ fun InfoScreen(
     val textFont = FontFamily(Font(R.font.impact))
     val bodyFontSize = 14.sp
     val splitedMoney = model.current.toString().split(".")
+    val bodyPadding = 5.dp
     val statsList = listOf(
         StatsModel("Doritos","23.15M"),
         StatsModel("Pringle","14.16M"),
@@ -255,7 +257,7 @@ fun InfoScreen(
             }
         }
     ) { innerPadding ->
-        Surface(
+        ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(screenScrollState)
@@ -273,9 +275,12 @@ fun InfoScreen(
                 }*/
                 .padding(innerPadding)
         ) {
-            if (screenScrollState.isScrollInProgress){
+            /*if (screenScrollState.isScrollInProgress){
                 println("Scrolling:${screenScrollState.value}")
-            }
+            }*/
+
+            val (headStats,graph, line1,lin2,) = createRefs()
+
             Column(
                 modifier = Modifier
                     .background(color = Color.Black)
@@ -526,6 +531,14 @@ fun Graph(
         mutableStateOf(GraphOutputType.WEEK)
     }
 
+    val graphTypes = listOf(
+        GraphSelector(type = GraphOutputType.HOUR,text ="1H"),
+        GraphSelector(type = GraphOutputType.DAY,text ="1D"),
+        GraphSelector(type = GraphOutputType.WEEK,text ="1W"),
+        GraphSelector(type = GraphOutputType.MONTH,text ="1M"),
+        GraphSelector(type = GraphOutputType.YEAR,text ="1Y")
+    )
+
     DisposableEffect(currentOutPut){
         val graphTypeReceiver = object : BroadcastReceiver(){
             override fun onReceive(p0: Context?, p1: Intent?) {
@@ -558,52 +571,19 @@ fun Graph(
             ),
         )
 
-        Row(
+        LazyRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            GraphOutPutSelector(
-                currentType = currentOutPut,
-                thisType = GraphOutputType.HOUR,
-                buttonText = "1H",
-                context = context
-            )
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            GraphOutPutSelector(
-                currentType = currentOutPut,
-                thisType = GraphOutputType.DAY,
-                buttonText = "1D",
-                context = context
-            )
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            GraphOutPutSelector(
-                currentType = currentOutPut,
-                thisType = GraphOutputType.WEEK,
-                buttonText = "1W",
-                context = context
-            )
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            GraphOutPutSelector(
-                currentType = currentOutPut,
-                thisType = GraphOutputType.MONTH,
-                buttonText = "1M",
-                context = context
-            )
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            GraphOutPutSelector(
-                currentType = currentOutPut,
-                thisType = GraphOutputType.YEAR,
-                buttonText = "1Y",
-                context = context
-            )
+            items(graphTypes) {
+                GraphOutPutSelector(
+                    currentType = currentOutPut,
+                    thisType = it.type,
+                    buttonText = it.text,
+                    context = context
+                )
+            }
         }
     }
 }
@@ -691,51 +671,53 @@ fun Stats(
     money: String,
     textFont: FontFamily
 ) {
-    Surface(
-        modifier = Modifier.background(color = Color.Black)
+    ConstraintLayout(
+        modifier = Modifier
+            .background(color = Color.Black)
+            .height(20.dp)
+            .fillMaxWidth()
     ) {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
+        val (statsIcon,statsName,statsMoney) = createRefs()
+        Image(
+            painter = painterResource(id = R.drawable.stats_icon),
+            contentDescription = null,
             modifier = Modifier
-                .background(color = Color.Black)
-                .fillMaxWidth()
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.stats_icon),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(16.dp),
-                contentScale = ContentScale.FillBounds
-            )
+                .size(16.dp)
+                .constrainAs(statsIcon) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                },
+            contentScale = ContentScale.FillBounds
+        )
+        Text(
+            text = name,
+            style = TextStyle(
+                color = Color.White
+            ),
+            fontSize = 15.sp,
+            fontFamily = textFont,
+            modifier = Modifier.constrainAs(statsName) {
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+                start.linkTo(statsIcon.end, margin = 5.dp)
+            }
+        )
 
-            Spacer(modifier = Modifier.width(4.dp))
-
-            Text(
-                text = name,
-                style = TextStyle(
-                    color = Color.White
-                ),
-                fontSize = 15.sp,
-                fontFamily = textFont
-            )
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "$$money",
-                style = TextStyle(
-                    color = Color.White
-                ),
-                fontSize = 15.sp,
-                fontFamily = textFont
-            )
-        }
+        Text(
+            text = "$$money",
+            style = TextStyle(
+                color = Color.White
+            ),
+            fontSize = 15.sp,
+            fontFamily = textFont,
+            modifier = Modifier.constrainAs(statsMoney) {
+                end.linkTo(parent.end)
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+            }
+        )
     }
-
 }
 
 @Composable
