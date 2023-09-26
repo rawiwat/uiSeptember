@@ -104,7 +104,7 @@ fun InfoScreen(
     }
     val offsetX by remember { mutableFloatStateOf(0f) }
     val screenScrollState = rememberScrollState()
-    val linksScrollState = rememberScrollState()
+    //val linksScrollState = rememberScrollState()
 
     var isFavorite by remember {
         mutableStateOf(false)
@@ -125,7 +125,9 @@ fun InfoScreen(
         LinkModel(imageId = R.drawable.internet_icon, name = "Website"),
         LinkModel(imageId = R.drawable.facebook_icon, name = "Facebook"),
         LinkModel(imageId = R.drawable.youtube_icon, name = "Youtube"),
-        LinkModel(imageId = R.drawable.twitter_icon, name = "Twitter")
+        LinkModel(imageId = R.drawable.twitter_icon, name = "Twitter"),
+        LinkModel(imageId = R.drawable.instagram_icon, name = "Instagram"),
+        LinkModel(imageId = R.drawable.line_icon, name = "Line")
     )
 
     Scaffold(
@@ -500,10 +502,13 @@ fun InfoScreen(
                     )
 
                     LazyRow(
-                        modifier = Modifier.horizontalScroll(linksScrollState)
+                        modifier = Modifier
                     ) {
-                        items(linkList, key = {it.name}) {
-                            Links(imageId = it.imageId, text = it.name)
+                        items(
+                            linkList,
+                            key = { it.name }
+                        ) { link->
+                            Links(imageId = link.imageId, text = link.name)
                         }
                     }
                 }
