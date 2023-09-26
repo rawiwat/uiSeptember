@@ -65,15 +65,17 @@ fun HomeScreen(
                 .background(Color.Black),
             horizontalAlignment = Alignment.CenterHorizontally,) {
             LazyColumn {
-                items(dataList,key = { it.id }) {
-                    ConstraintSelector(model = it, navController = navController)
+                items(dataList,key = { it.id } ) {
+                    ConstraintSelector(
+                        model = it,
+                        navController = navController
+                    )
                 }
             }
         }
     }
-
 }
-
+/*
 @Composable
 fun Selector(
     model: Model,
@@ -193,7 +195,7 @@ fun Selector(
             }
         }
     }
-}
+}*/
 
 @Composable
 fun ConstraintSelector(
@@ -301,9 +303,7 @@ fun ConstraintSelector(
         )
     }
 }
-
-
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun PreviewSelection() {
     UiAssignmentSeptemberTheme {
@@ -331,7 +331,7 @@ fun ConstraintPreview() {
             ConstraintSelector(model = FakeDatabase().getModelFromID(2).toModel(),nav)
         }
     }
-}
+}*/
 
 @Preview(showBackground = true)
 @Composable

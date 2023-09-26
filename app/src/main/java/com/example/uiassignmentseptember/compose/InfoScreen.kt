@@ -10,9 +10,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +21,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -35,7 +31,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -43,7 +38,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -257,9 +251,9 @@ fun InfoScreen(
             }
         }
     ) { innerPadding ->
-        ConstraintLayout(
+        Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .verticalScroll(screenScrollState)
                 .offset { IntOffset(offsetX.roundToInt(), 0) }
                 /*.pointerInput(Unit) {
@@ -273,251 +267,252 @@ fun InfoScreen(
                         }
                     }
                 }*/
-                .padding(innerPadding)
+                .background(color = Color.Black)
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateTopPadding(),
+                    end = bodyPadding,
+                    start = bodyPadding
+                )
         ) {
             /*if (screenScrollState.isScrollInProgress){
                 println("Scrolling:${screenScrollState.value}")
             }*/
 
-            val (headStats,graph, line1,lin2,) = createRefs()
+            //val (head, graph, myInfo, detailText, stats, link, readmore) = createRefs()
 
             Column(
                 modifier = Modifier
-                    .background(color = Color.Black)
+                    .padding(start = 8.dp)
             ) {
-                Spacer(modifier = Modifier.height(15.dp))
+                Image(
+                    painter = painterResource(id = model.imageId),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .padding(5.dp)
+                        .clip(CircleShape)
+                )
 
-                Column(
-                    modifier = Modifier.padding(start = 8.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = model.imageId),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        alignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(50.dp)
-                            .padding(5.dp)
-                            .clip(CircleShape)
-                    )
+                Text(
+                    text = model.name,
+                    style = TextStyle(
+                        color = primaryColor
+                    ),
+                    fontFamily = textFont,
+                    fontSize = 13.sp
+                )
 
+                Row {
                     Text(
-                        text = model.name,
+                        text = "$${splitedMoney[0]}",
                         style = TextStyle(
                             color = primaryColor
                         ),
                         fontFamily = textFont,
-                        fontSize = 13.sp
+                        fontSize = 30.sp
+                    )
+                    Text(
+                        text = ".${splitedMoney[1]}",
+                        style = TextStyle(
+                            color = secondaryColor
+                        ),
+                        fontFamily = textFont,
+                        fontSize = 30.sp
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(
+                            id = if(model.positiveGrowth)
+                                R.drawable.up
+                            else R.drawable.down
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(6.dp)
                     )
 
-                    Row {
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Text(
+                        text = "${model.growthPercent}%",
+                        style = TextStyle(
+                            color = if (model.positiveGrowth) {
+                                Color.Green
+                            } else {
+                                Color.Red
+                            }
+                        ),
+                        fontFamily = textFont,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(9.dp))
+
+            Graph(
+                model = model, context
+            )
+            Column(
+                modifier = Modifier
+            ) {
+                Spacer(modifier = Modifier.height(9.dp))
+
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    val canvasWidth = size.width
+                    val canvasHeight = size.height
+                    drawLine(
+                        start = Offset(x = canvasWidth, y = 0f),
+                        end = Offset(x = 0f, y = canvasHeight),
+                        color = secondaryColor
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(9.dp))
+
+                Text(
+                    text = "Your balance",
+                    style = TextStyle(
+                        color = secondaryColor
+                    ),
+                    fontFamily = textFont,
+                    fontSize = bodyFontSize
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = Modifier
+                    ) {
                         Text(
-                            text = "$${splitedMoney[0]}",
+                            text = "$4.20",
                             style = TextStyle(
-                                color = primaryColor
+                                color = Color.White
                             ),
                             fontFamily = textFont,
-                            fontSize = 30.sp
-                        )
-                        Text(
-                            text = ".${splitedMoney[1]}",
-                            style = TextStyle(
-                                color = secondaryColor
-                            ),
-                            fontFamily = textFont,
-                            fontSize = 30.sp
+                            fontSize = bodyFontSize
                         )
                     }
 
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Image(
-                            painter = painterResource(
-                                id = if(model.positiveGrowth)
-                                        R.drawable.up
-                                    else R.drawable.down
-                            ),
+                            painter = painterResource(R.drawable.share_plane),
                             contentDescription = null,
                             modifier = Modifier
-                                .size(6.dp)
+                                .size(22.dp)
+                                .clickable { navController.navigate("transaction/${model.id}") }
                         )
 
                         Spacer(modifier = Modifier.width(5.dp))
-
-                        Text(
-                            text = "${model.growthPercent}%",
-                            style = TextStyle(
-                                color = if (model.positiveGrowth) {
-                                    Color.Green
-                                } else {
-                                    Color.Red
-                                }
-                            ),
-                            fontFamily = textFont,
-                            fontSize = 12.sp
-                        )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "1.8.2 Lime",
+                    style = TextStyle(
+                        color = secondaryColor
+                    ),
+                    fontFamily = textFont,
+                    fontSize = bodyFontSize
+                )
 
-                Graph(model = model,context)
+                Spacer(modifier = Modifier.height(9.dp))
 
-                Column(
+                Canvas(
                     modifier = Modifier
-                        .padding(start = 6.dp,end = 6.dp)
+                        .fillMaxWidth()
                 ) {
-
-                    Spacer(modifier = Modifier.height(9.dp))
-
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        val canvasWidth = size.width
-                        val canvasHeight = size.height
-                        drawLine(
-                            start = Offset(x = canvasWidth, y = 0f),
-                            end = Offset(x = 0f, y = canvasHeight),
-                            color = secondaryColor
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(9.dp))
-
-                    Text(
-                        text = "Your balance",
-                        style = TextStyle(
-                            color = secondaryColor
-                        ),
-                        fontFamily = textFont,
-                        fontSize = bodyFontSize
+                    val canvasWidth = size.width
+                    val canvasHeight = size.height
+                    drawLine(
+                        start = Offset(x = canvasWidth, y = 0f),
+                        end = Offset(x = 0f, y = canvasHeight),
+                        color = secondaryColor
                     )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.Start,
-                            modifier = Modifier
-                        ) {
-                            Text(
-                                text = "$4.20",
-                                style = TextStyle(
-                                    color = Color.White
-                                ),
-                                fontFamily = textFont,
-                                fontSize = bodyFontSize
-                            )
-                        }
-
-                        Row(
-                            horizontalArrangement = Arrangement.End,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.share_plane),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(22.dp)
-                                    .clickable { navController.navigate("transaction/${model.id}") }
-                            )
-
-                            Spacer(modifier = Modifier.width(5.dp))
-                        }
-                    }
-
-                    Text(
-                        text = "1.8.2 Lime",
-                        style = TextStyle(
-                            color = secondaryColor
-                        ),
-                        fontFamily = textFont,
-                        fontSize = bodyFontSize
-                    )
-
-                    Spacer(modifier = Modifier.height(9.dp))
-
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        val canvasWidth = size.width
-                        val canvasHeight = size.height
-                        drawLine(
-                            start = Offset(x = canvasWidth, y = 0f),
-                            end = Offset(x = 0f, y = canvasHeight),
-                            color = secondaryColor
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(9.dp))
-
-                    Text(
-                        text = FakeDatabase().getDetailFromId(model.id),
-                        maxLines = if (readMore) Int.MAX_VALUE else 3,
-                        overflow = TextOverflow.Ellipsis,
-                        style = TextStyle(color = Color.White),
-                        modifier = Modifier.animateContentSize(animationSpec = tween(1000)),
-                        fontSize = bodyFontSize,
-                        fontFamily = textFont
-                    )
-
-                    Text(
-                        text = if (readMore) "Show Less" else "Read More",
-                        modifier = Modifier
-                            .clickable { readMore = !readMore },
-                        style = TextStyle(
-                            color = colorResource(id = R.color.teal_200)
-                        ),
-                        fontSize = bodyFontSize,
-                        fontFamily = textFont
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "Stats",
-                        style = TextStyle(
-                            color = secondaryColor
-                        ),
-                        fontSize = bodyFontSize,
-                        fontFamily = textFont
-                    )
-
-                    for (stats in statsList) {
-                        Stats(
-                            name = stats.name,
-                            money = stats.money,
-                            textFont = textFont
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "Stats",
-                        style = TextStyle(
-                            color = secondaryColor
-                        ),
-                        fontSize = bodyFontSize,
-                        fontFamily = textFont
-                    )
-
-                    LazyRow(
-                        modifier = Modifier
-                    ) {
-                        items(
-                            linkList,
-                            key = { it.name }
-                        ) { link->
-                            Links(imageId = link.imageId, text = link.name)
-                        }
-                    }
                 }
             }
+
+            Spacer(modifier = Modifier.height(9.dp))
+
+            Text(
+                text = FakeDatabase().getDetailFromId(model.id),
+                maxLines = if (readMore) Int.MAX_VALUE else 3,
+                overflow = TextOverflow.Ellipsis,
+                style = TextStyle(color = Color.White),
+                modifier = Modifier.animateContentSize(animationSpec = tween(1000)),
+                fontSize = bodyFontSize,
+                fontFamily = textFont
+            )
+
+            Text(
+                text = if (readMore) "Show Less" else "Read More",
+                modifier = Modifier
+                    .clickable { readMore = !readMore },
+                style = TextStyle(
+                    color = colorResource(id = R.color.teal_200)
+                ),
+                fontSize = bodyFontSize,
+                fontFamily = textFont
+            )
+
+            Spacer(modifier = Modifier.height(9.dp))
+
+            Text(
+                text = "Stats",
+                style = TextStyle(
+                    color = secondaryColor
+                ),
+                fontSize = bodyFontSize,
+                fontFamily = textFont
+            )
+
+            for (snack in statsList) {
+                Stats(
+                    name = snack.name,
+                    money = snack.money,
+                    textFont = textFont
+                )
+            }
+
+            Spacer(modifier = Modifier.height(9.dp))
+
+            Text(
+                text = "Links",
+                style = TextStyle(
+                    color = secondaryColor
+                ),
+                fontSize = bodyFontSize,
+                fontFamily = textFont
+            )
+
+            LazyRow(
+                modifier = Modifier
+            ) {
+                items(
+                    linkList,
+                    key = { it.name }
+                ) { link->
+                    Links(imageId = link.imageId, text = link.name)
+                }
+            }
+
+
         }
     }
 }
@@ -576,7 +571,10 @@ fun Graph(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            items(graphTypes) {
+            items(
+                graphTypes,
+                key = { it.text }
+            ) {
                 GraphOutPutSelector(
                     currentType = currentOutPut,
                     thisType = it.type,
@@ -642,6 +640,8 @@ fun GraphOutPutSelector(
     buttonText: String,
     context: Context
 ) {
+    Spacer(modifier = Modifier.width(5.dp))
+
     Button(
         onClick = {
             val intent = Intent("ChangeGraphOutput")
@@ -663,6 +663,8 @@ fun GraphOutPutSelector(
             fontFamily = FontFamily(Font(R.font.impact))
         )
     }
+
+    Spacer(modifier = Modifier.width(5.dp))
 }
 
 @Composable
