@@ -116,7 +116,7 @@ fun Transaction(
                             sendingMoney += received
                         } else if (received == ".") {
                             if (sendingMoney.contains(".")) {
-                                sendingMoney.filterNot{ it == '.' }
+                                sendingMoney = sendingMoney.filterNot { it == '.' }
                                 sendingMoney += "."
                             } else {
                                 sendingMoney += "."
