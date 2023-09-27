@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -87,6 +89,8 @@ fun PhotoDetail(
 
     val traits = Trait.values().toList()
 
+    val scrollState = rememberScrollState()
+
     Scaffold(
         topBar = {
             ConstraintLayout(
@@ -124,162 +128,39 @@ fun PhotoDetail(
             }
         }
     ) { it ->
-        Column(
+        Surface(
             modifier = Modifier
-                .background(color = Color.Black)
-                .padding(it)
                 .fillMaxSize()
+                .verticalScroll(
+                state = scrollState
+            )
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .background(color = Color.Black)
+                    .padding(it)
+                    .fillMaxSize()
+                    .height(1000.dp)
             ) {
-                Image(
-                    painter = painterResource(id = photoId),
-                    contentDescription = null,
+                Column(
                     modifier = Modifier
-                        .size(screenWidth.dp)
-                        .padding(
-                            start = sideScreenPadding,
-                            end = sideScreenPadding
-                        )
-                )
-            }
-
-            Text(
-                text = "$name $tag",
-                fontSize = 18.sp,
-                fontFamily = textFont,
-                style = TextStyle(
-                    color = primaryColor
-                ),
-                modifier = Modifier
-                    .padding(start = sideScreenPadding)
-            )
-
-            Spacer(modifier = Modifier.height(betweenComponentPadding))
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                    .padding(
-                        start = sideScreenPadding,
-                        end = sideScreenPadding
-                    )
-            ) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    color = Color.DarkGray
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    Image(
+                        painter = painterResource(id = photoId),
+                        contentDescription = null,
                         modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Image(
-                            painter = painterResource(id = R.drawable.token_unity),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(35.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Fit
-                        )
-
-                        Column() {
-                            Text(
-                                text = name,
-                                fontSize = 18.sp,
-                                fontFamily = textFont,
-                                style = TextStyle(
-                                    color = primaryColor
-                                ),
-                                modifier = Modifier
-                                    .padding(start = sideScreenPadding)
+                            .size(screenWidth.dp)
+                            .padding(
+                                start = sideScreenPadding,
+                                end = sideScreenPadding
                             )
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                Text(
-                                    text = "Floor:",
-                                    fontSize = 18.sp,
-                                    fontFamily = textFont,
-                                    style = TextStyle(
-                                        color = secondaryColor
-                                    ),
-                                    modifier = Modifier
-                                        .padding(start = sideScreenPadding)
-                                )
-
-                                Image(
-                                    painter = painterResource(id = R.drawable.crystal_icon),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(25.dp),
-                                    contentScale = ContentScale.FillBounds
-                                )
-
-                                Text(
-                                    text = "0.420",
-                                    fontSize = 18.sp,
-                                    fontFamily = textFont,
-                                    style = TextStyle(
-                                        color = secondaryColor
-                                    ),
-                                    modifier = Modifier
-                                )
-                            }
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End,
-                        ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.point_back_bright),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(25.dp)
-                                .rotate(180f)
-                        )
-
-                        Spacer(modifier = Modifier.width(betweenComponentPadding))
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(betweenComponentPadding))
-
-            Text(
-                text = "Arch-Nemesis of $enemyName their battle shook the metaverse to it's core",
-                fontSize = 18.sp,
-                fontFamily = textFont,
-                style = TextStyle(
-                    color = primaryColor
-                ),
-                modifier = Modifier
-                    .padding(
-                        start = sideScreenPadding,
-                        end = sideScreenPadding
                     )
-            )
+                }
 
-            Spacer(modifier = Modifier.height(betweenComponentPadding))
-
-            Surface(
-                color = Color.Black,
-                modifier = Modifier.height(30.dp)
-            ) {
                 Text(
-                    text = "Owned by",
+                    text = "$name $tag",
                     fontSize = 18.sp,
                     fontFamily = textFont,
                     style = TextStyle(
@@ -289,54 +170,187 @@ fun PhotoDetail(
                         .padding(start = sideScreenPadding)
                 )
 
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End,
+                Spacer(modifier = Modifier.height(betweenComponentPadding))
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .padding(
+                            start = sideScreenPadding,
+                            end = sideScreenPadding
+                        )
                 ) {
-                    Image(
-                        painter = painterResource(id = model.imageId),
-                        contentDescription = null,
+                    Surface(
                         modifier = Modifier
-                            .size(25.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
+                            .fillMaxSize(),
+                        color = Color.DarkGray
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Image(
+                                painter = painterResource(id = R.drawable.token_unity),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(35.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Fit
+                            )
+
+                            Column() {
+                                Text(
+                                    text = name,
+                                    fontSize = 18.sp,
+                                    fontFamily = textFont,
+                                    style = TextStyle(
+                                        color = primaryColor
+                                    ),
+                                    modifier = Modifier
+                                        .padding(start = sideScreenPadding)
+                                )
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Start
+                                ) {
+                                    Text(
+                                        text = "Floor:",
+                                        fontSize = 18.sp,
+                                        fontFamily = textFont,
+                                        style = TextStyle(
+                                            color = secondaryColor
+                                        ),
+                                        modifier = Modifier
+                                            .padding(start = sideScreenPadding)
+                                    )
+
+                                    Image(
+                                        painter = painterResource(id = R.drawable.crystal_icon),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(25.dp),
+                                        contentScale = ContentScale.FillBounds
+                                    )
+
+                                    Text(
+                                        text = "0.420",
+                                        fontSize = 18.sp,
+                                        fontFamily = textFont,
+                                        style = TextStyle(
+                                            color = secondaryColor
+                                        ),
+                                        modifier = Modifier
+                                    )
+                                }
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End,
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.point_back_bright),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(25.dp)
+                                    .rotate(180f)
+                            )
+
+                            Spacer(modifier = Modifier.width(betweenComponentPadding))
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(betweenComponentPadding))
+
+                Text(
+                    text = "Arch-Nemesis of $enemyName their battle shook the metaverse to it's core",
+                    fontSize = 18.sp,
+                    fontFamily = textFont,
+                    style = TextStyle(
+                        color = primaryColor
+                    ),
+                    modifier = Modifier
+                        .padding(
+                            start = sideScreenPadding,
+                            end = sideScreenPadding
+                        )
+                )
+
+                Spacer(modifier = Modifier.height(betweenComponentPadding))
+
+                Surface(
+                    color = Color.Black,
+                    modifier = Modifier.height(30.dp)
+                ) {
                     Text(
-                        text = " ${model.name}",
-                        style = TextStyle(
-                            color = secondaryColor
-                        ),
+                        text = "Owned by",
                         fontSize = 18.sp,
                         fontFamily = textFont,
-                        modifier = Modifier.padding(end = sideScreenPadding),
+                        style = TextStyle(
+                            color = primaryColor
+                        ),
+                        modifier = Modifier
+                            .padding(start = sideScreenPadding)
                     )
+
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End,
+                    ) {
+                        Image(
+                            painter = painterResource(id = model.imageId),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(25.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(
+                            text = " ${model.name}",
+                            style = TextStyle(
+                                color = secondaryColor
+                            ),
+                            fontSize = 18.sp,
+                            fontFamily = textFont,
+                            modifier = Modifier.padding(end = sideScreenPadding),
+                        )
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(betweenComponentPadding))
+                Spacer(modifier = Modifier.height(betweenComponentPadding))
 
-            Text(
-                text = "Traits",
-                style = TextStyle(
-                    color = primaryColor
-                ),
-                fontSize = 18.sp,
-                fontFamily = textFont,
-                modifier = Modifier.padding(start = sideScreenPadding),
-            )
+                Text(
+                    text = "Traits",
+                    style = TextStyle(
+                        color = primaryColor
+                    ),
+                    fontSize = 18.sp,
+                    fontFamily = textFont,
+                    modifier = Modifier.padding(start = sideScreenPadding),
+                )
 
-            Spacer(modifier = Modifier.height(betweenComponentPadding))
+                Spacer(modifier = Modifier.height(betweenComponentPadding))
 
-            LazyRow {
-                items(
-                    traits,
-                    key = { it.type }
-                ) {
-                    TraitBox(trait = it)
+                LazyRow {
+                    items(
+                        traits,
+                        key = { it.type }
+                    ) {
+                        TraitBox(trait = it)
+                    }
                 }
             }
         }
+
     }
 }
 

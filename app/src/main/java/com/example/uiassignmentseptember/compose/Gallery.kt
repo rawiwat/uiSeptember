@@ -216,7 +216,8 @@ fun Gallery(
                 PhotoInGallery(
                     imageId = it,
                     size = size,
-                    navController = navController
+                    navController = navController,
+                    modelId = modelId
                 )
             }
         }
@@ -228,7 +229,8 @@ fun Gallery(
 fun PhotoInGallery(
     imageId:Int,
     size:Int,
-    navController: NavController
+    navController: NavController,
+    modelId: Int
 ) {
     Card(
         modifier = Modifier
@@ -252,7 +254,7 @@ fun PhotoInGallery(
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable {
-                        navController.navigate("PhotoDetail/$imageId")
+                        navController.navigate("PhotoDetail/$modelId/$imageId")
                     },
                 contentScale = ContentScale.Crop,
                 contentDescription = ""

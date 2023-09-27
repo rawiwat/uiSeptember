@@ -43,7 +43,7 @@ fun App(navController: NavHostController,context: Context) {
     val animationTime = 1200
     NavHost(
         navController = navController,
-        startDestination = "Gallery"
+        startDestination = "Home"
     ) {
         composable(
             route = "Home",
