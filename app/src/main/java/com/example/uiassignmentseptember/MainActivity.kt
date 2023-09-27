@@ -151,7 +151,8 @@ fun App(navController: NavHostController,context: Context) {
             if (it.arguments!=null) {
                 PhotoDetail(
                     modelId = it.arguments!!.getInt("userId"),
-                    photoId = it.arguments!!.getInt("photoId")
+                    photoId = it.arguments!!.getInt("photoId"),
+                    navController = navController
                 )
             }
         }
