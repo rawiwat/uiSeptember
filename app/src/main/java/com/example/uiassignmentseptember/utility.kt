@@ -146,3 +146,25 @@ fun getRandomName():String {
             "Nathalie Guevara",
             "Tommy Knox").random()
 }
+
+enum class Trait(val type: String) {
+    HAT("Hat"),
+    BODY("Body"),
+    EYES("Eyes"),
+    MOUTH("Mouth"),
+    EAR("Ear"),
+    ARM("Arm"),
+    LEG("Leg")
+}
+
+fun traitsValueGenerator(traitType: Trait):String {
+    return when(traitType) {
+        Trait.HAT -> listOf("Chef","Fedora","Cap","Top Hat","Deerstalker").random()
+        Trait.BODY -> listOf("Suit", "T-Shirt", "Pajamas", "Sleeveless","Blouse").random()
+        Trait.EYES -> listOf("Black","Blue","Red","Brown","Green").random()
+        Trait.MOUTH -> listOf("Bow","Heart","Full","Wide","Top-Heavy").random()
+        Trait.EAR -> listOf("Pointy","Square","Broad","Protruding","Pierced").random()
+        Trait.ARM -> listOf("Glove","Ring","Watch","Band","Armlet").random()
+        Trait.LEG -> listOf("Legging","Jeans","Pajamas","Pants","Jeggings").random()
+    }
+}
