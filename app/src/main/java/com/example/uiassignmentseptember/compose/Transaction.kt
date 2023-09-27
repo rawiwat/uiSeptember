@@ -568,7 +568,7 @@ fun ChangeModel(
     context:Context
 ) {
     val configuration = LocalConfiguration.current
-    val viewModel = SwipeViewModel(configuration.screenHeightDp / 2,context)
+    val viewModel = SwipeViewModel(configuration.screenHeightDp / 2, context)
     val offset by viewModel.currentOffset.collectAsState()
     val secondaryColor = colorResource(id = R.color.teal_700)
     val textFont = FontFamily(Font(R.font.impact))
@@ -631,26 +631,18 @@ fun ChangeModel(
                 Canvas(
                     modifier = Modifier
                         .width(50.dp)
-                        /*.pointerInput(Unit) {
+                        .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consume()
-                                offset.intValue += dragAmount.y.toInt()
-                                if (offset.intValue < 0) {
-                                    offset.intValue = 0
-                                }
-
-                                if (offset.intValue >= (configuration.screenHeightDp * 3 / 4)) {
-                                    offset.intValue = (configuration.screenHeightDp / 2)
-                                    active = false
-                                }
+                                viewModel.changeOffset(dragAmount.y.toInt())
                             }
-                        }*/
-                        .draggable(
+                        }
+                        /*.draggable(
                             state = rememberDraggableState { delta ->
                                 viewModel.changeOffset(delta.toInt())
                             },
                             orientation = Orientation.Vertical
-                        ),
+                        )*/,
                 ) {
                     val canvasWidth = size.width
 
@@ -1018,7 +1010,7 @@ fun PreviewModelChanger() {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewModelSelecter() {
+fun PreviewModelSelector() {
     UiAssignmentSeptemberTheme {
         ModelOption(model = FakeDatabase().getModelFromID(2).toModel(), context = LocalContext.current)
     }
@@ -1026,7 +1018,7 @@ fun PreviewModelSelecter() {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewContraint() {
+fun PreviewConstraint() {
     UiAssignmentSeptemberTheme {
         ConstraintOption(FakeDatabase().getModelFromID(1).toModel(), LocalContext.current)
     }

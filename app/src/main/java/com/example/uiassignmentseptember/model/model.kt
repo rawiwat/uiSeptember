@@ -49,6 +49,7 @@ sealed class AppScreenTypes(val route: String, args: String? = null){
     class Screen1(args: String? = null): AppScreenTypes(route = "screen1", args = args)
     class Screen2(args: String? = null): AppScreenTypes(route = "screen1", args = args)
 }*/
+
 @Immutable
 data class GraphSelector(
     val type: GraphOutputType,

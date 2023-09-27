@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.uiassignmentseptember.compose.Gallery
 import com.example.uiassignmentseptember.compose.HomeScreen
 import com.example.uiassignmentseptember.compose.InfoScreen
 import com.example.uiassignmentseptember.compose.Transaction
@@ -42,7 +43,7 @@ fun App(navController: NavHostController,context: Context) {
     val animationTime = 1200
     NavHost(
         navController = navController,
-        startDestination = "Home"
+        startDestination = "Gallery"
     ) {
         composable(
             route = "Home",
@@ -116,6 +117,10 @@ fun App(navController: NavHostController,context: Context) {
                     textFont = FontFamily(Font(R.font.impact)),
                     context = context, modelId = it1.getInt("id"))
             }
+        }
+
+        composable(route = "Gallery") {
+            Gallery(context = context)
         }
     }
 }

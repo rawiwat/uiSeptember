@@ -1,5 +1,6 @@
 package com.example.uiassignmentseptember
 
+import android.content.Context
 import android.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -69,4 +70,26 @@ fun getPointData(type: GraphOutputType, fullData:List<Point>):List<Point> {
         GraphOutputType.MONTH -> fullData.subList(0,60)
         GraphOutputType.YEAR -> fullData.subList(0,200)
     }
+}
+
+fun getImageIds(context: Context): List<Int> {
+    val imageIds = mutableListOf<Int>()
+    val packageName = context.packageName
+    val resources = context.resources
+    val drawableClass = R.drawable::class.java
+
+    try {
+        val fields = drawableClass.fields
+        for (field in fields) {
+            val resourceName = field.name
+            val resourceId = resources.getIdentifier(resourceName, "drawable", packageName)
+            if (resourceId != 0) {
+                imageIds.add(resourceId)
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+
+    return imageIds
 }
