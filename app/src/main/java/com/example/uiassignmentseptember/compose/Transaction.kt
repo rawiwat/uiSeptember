@@ -14,6 +14,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -45,7 +46,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,7 +61,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -79,6 +78,10 @@ import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.toModel
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun Transaction(
@@ -113,7 +116,7 @@ fun Transaction(
                             sendingMoney += received
                         } else if (received == ".") {
                             if (sendingMoney.contains(".")) {
-                                sendingMoney.replace(".","")
+                                sendingMoney.filterNot{ it == '.' }
                                 sendingMoney += "."
                             } else {
                                 sendingMoney += "."
@@ -159,6 +162,7 @@ fun Transaction(
             context.unregisterReceiver(modelBroadcastReceiver)
         }
     }
+
     Scaffold(
         topBar = {
             Surface(
@@ -573,9 +577,9 @@ fun ChangeModel(
         R.drawable.token_jgp,
         R.drawable.token_unity
     )
-
+    val padding8 = 8.dp
     var active by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
 
     DisposableEffect(active) {
@@ -619,25 +623,41 @@ fun ChangeModel(
                     .fillMaxSize()
                     .background(color = Color.Black)
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(padding8))
 
                 Canvas(
                     modifier = Modifier
                         .width(50.dp)
-                        .pointerInput(Unit) {
+                        /*.pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consume()
-                                offset += dragAmount.y.toInt()
-                                if (offset < 0) {
-                                    offset = 0
+                                offset.intValue += dragAmount.y.toInt()
+                                if (offset.intValue < 0) {
+                                    offset.intValue = 0
                                 }
 
-                                if (offset >= (configuration.screenHeightDp * 3 / 4)) {
-                                    offset = (configuration.screenHeightDp / 2)
+                                if (offset.intValue >= (configuration.screenHeightDp * 3 / 4)) {
+                                    offset.intValue = (configuration.screenHeightDp / 2)
                                     active = false
                                 }
                             }
-                        },
+                        }*/
+                        .draggable(
+                            state = rememberDraggableState { delta ->
+                                offset += delta.toInt()
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    if (offset < 0) {
+                                        offset = 0
+                                    }
+
+                                    if (offset >= (configuration.screenHeightDp * 3 / 4)) {
+                                        offset = (configuration.screenHeightDp / 2)
+                                        active = false
+                                    }
+                                }
+                            },
+                            orientation = Orientation.Vertical
+                        ),
                 ) {
                     val canvasWidth = size.width
 
@@ -649,15 +669,15 @@ fun ChangeModel(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(padding8))
 
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(30.dp)
                         .padding(
-                            start = 8.dp,
-                            end = 8.dp
+                            start = padding8,
+                            end = padding8
                         ),
                     colors = CardDefaults.cardColors(
                         contentColor = Color.DarkGray,
@@ -670,7 +690,7 @@ fun ChangeModel(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(padding8))
 
                         AsyncImage(
                             model = R.drawable.search_icon,
@@ -678,7 +698,7 @@ fun ChangeModel(
                             modifier = Modifier.size(18.dp)
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(padding8))
 
                         Text(
                             text = "Search tokens"
@@ -686,7 +706,7 @@ fun ChangeModel(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(padding8))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -714,7 +734,7 @@ fun ChangeModel(
                             }
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(padding8))
 
                         AsyncImage(
                             model = R.drawable.point_back,
@@ -724,11 +744,11 @@ fun ChangeModel(
                                 .rotate(-90f)
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(padding8))
                     }
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(padding8))
 
                 LazyColumn {
                     items(
