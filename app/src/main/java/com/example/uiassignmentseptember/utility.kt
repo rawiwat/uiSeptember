@@ -1,8 +1,6 @@
 package com.example.uiassignmentseptember
 
 import android.content.Context
-import android.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -25,8 +23,7 @@ fun getTokenOffset(id: Int):Int {
 
 fun generateAXisX(
     pointsData: List<Point>,
-    stepSize: Int,
-    axisPadding: Int
+    stepSize: Int
 ): AxisData {
     return AxisData.Builder()
         .axisStepSize(stepSize.dp)
@@ -38,8 +35,7 @@ fun generateAXisX(
 }
 
 fun generateAxisY(
-    stepSize: Int,
-    axisPadding: Int
+    stepSize: Int
 ): AxisData {
     return AxisData.Builder()
         .steps(stepSize)

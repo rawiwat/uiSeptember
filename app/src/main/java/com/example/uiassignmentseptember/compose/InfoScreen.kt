@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -231,7 +230,9 @@ fun InfoScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-                    onClick = {},
+                    onClick = {
+                        navController.navigate("Gallery/${model.id}")
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = primaryColor,
                         contentColor = Color.Black
@@ -562,10 +563,9 @@ fun Graph(
                 lineColor = model.chartColor,
                 xAxisData = generateAXisX(
                     getPointData(currentOutPut,model.pointData),
-                    getAxisXStepSize(currentOutPut),
-                    10
+                    getAxisXStepSize(currentOutPut)
                 ),
-                yAxisData = generateAxisY(20,0)
+                yAxisData = generateAxisY(20)
             ),
         )
 
@@ -770,7 +770,6 @@ fun Links(
             )
         }
     }
-
     Spacer(modifier = Modifier.width(4.dp))
 }
 

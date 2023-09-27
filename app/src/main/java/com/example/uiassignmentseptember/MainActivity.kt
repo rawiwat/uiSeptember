@@ -19,9 +19,9 @@ import androidx.navigation.navArgument
 import com.example.uiassignmentseptember.compose.Gallery
 import com.example.uiassignmentseptember.compose.HomeScreen
 import com.example.uiassignmentseptember.compose.InfoScreen
+import com.example.uiassignmentseptember.compose.PhotoDetail
 import com.example.uiassignmentseptember.compose.Transaction
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
-import dagger.hilt.android.AndroidEntryPoint
 
 //@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -119,8 +119,41 @@ fun App(navController: NavHostController,context: Context) {
             }
         }
 
-        composable(route = "Gallery") {
-            Gallery(context = context)
+        composable(
+            route = "Gallery/{id}",
+            arguments = listOf(
+                navArgument(name = "id") {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            if (it.arguments!=null) {
+                Gallery(
+                    images = getImageIds(context),
+                    modelId = it.arguments!!.getInt("id"),
+                    textFont = FontFamily(Font(R.font.impact)),
+                    navController = navController
+                )
+            }
+        }
+
+        composable(
+            route = "PhotoDetail/{userId}/{photoId}",
+            arguments = listOf(
+                navArgument(name = "userId") {
+                    type = NavType.IntType
+                },
+                navArgument(name = "photoId") {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            if (it.arguments!=null) {
+                PhotoDetail(
+                    modelId = it.arguments!!.getInt("userId"),
+                    photoId = it.arguments!!.getInt("photoId")
+                )
+            }
         }
     }
 }
