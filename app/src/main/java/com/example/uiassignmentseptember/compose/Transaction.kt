@@ -14,8 +14,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +43,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +56,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -73,15 +71,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import com.example.uiassignmentseptember.R
+import com.example.uiassignmentseptember.SwipeViewModel
 import com.example.uiassignmentseptember.getTokenOffset
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.Model
 import com.example.uiassignmentseptember.model.toModel
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun Transaction(
@@ -566,7 +561,8 @@ fun ChangeModel(
     context:Context
 ) {
     val configuration = LocalConfiguration.current
-    var offset by remember { mutableIntStateOf(configuration.screenHeightDp / 2) }
+    val viewModel = SwipeViewModel(configuration.screenHeightDp / 2)
+    val offset by viewModel.currentOffset.collectAsState()
     val secondaryColor = colorResource(id = R.color.teal_700)
     val textFont = FontFamily(Font(R.font.impact))
     val listOfTokenImageId = listOf(
@@ -587,7 +583,7 @@ fun ChangeModel(
             override fun onReceive(p0: Context?, p1: Intent?) {
                 val activationReceived = p1!!.getBooleanExtra("change_activation_to", false)
                 active = activationReceived
-                offset = (configuration.screenHeightDp / 2)
+                viewModel.setOffsetToDefault()
             }
         }
         context.registerReceiver(
@@ -644,17 +640,7 @@ fun ChangeModel(
                         }*/
                         .draggable(
                             state = rememberDraggableState { delta ->
-                                offset += delta.toInt()
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    if (offset < 0) {
-                                        offset = 0
-                                    }
-
-                                    if (offset >= (configuration.screenHeightDp * 3 / 4)) {
-                                        offset = (configuration.screenHeightDp / 2)
-                                        active = false
-                                    }
-                                }
+                                viewModel.changeOffset(delta.toInt())
                             },
                             orientation = Orientation.Vertical
                         ),
