@@ -194,7 +194,7 @@ fun generateActivityDetail(type:ActivityTypes):String {
         }
 }
 
-data class ActivityTime(
+data class Hour(
     val text:String,
     val value:Int
 )
@@ -203,43 +203,51 @@ fun trimDouble(doubleValue: Double): Double {
     return String.format("%.3f", doubleValue).toDouble()
 }
 
-fun getRandomTime(): ActivityTime {
+fun getRandomTime(): Hour {
     val amORpm = listOf("pm","am").random()
     val hour = Random.nextInt(1,12)
     val minutes = Random.nextInt(0,59)
+    val minutesString = if (minutes >= 10) minutes.toString() else "0$minutes"
     var value = (hour * 60) + minutes
     if (amORpm == "pm") {
         value += 720
     }
-    return ActivityTime(
-        text = "$hour:$minutes$amORpm",
+    return Hour(
+        text = "$hour:$minutesString$amORpm",
         value = value
     )
 }
 
+data class Time(
+    val date: Date,
+    val hour: Hour
+)
 data class CryptoActivity(
     val type: String,
     val detail: String,
-    val time: ActivityTime,
-    val date: Date
+    val time: Time,
+    val id: Int
 )
 
-data class Date(val month: Month, val day: Int)
+data class Date(
+    val month: Month,
+    val day: Int
+)
 
-enum class Month(val monthName:String, val day: Int,val order:Int) {
-    TODAY("January",30,0),
-    JANUARY("January",31,1),
-    FEBRUARY("February",28,2),
-    MARCH("March",31,3),
-    APRIL("April",30,4),
-    MAY("May",31,5),
-    JUNE("June",30,6),
-    JULY("July",31,7),
-    AUGUST("August",31,8),
-    SEPTEMBER("September",30,9),
-    OCTOBER("October",31,10),
-    NOVEMBER("November",30,11),
-    DECEMBER("December",31,12)
+enum class Month(val day: Int) {
+    Today(30),
+    September(30),
+    August(31),
+    July(31),
+    June(30),
+    May(31),
+    April(30),
+    March(31),
+    February(28),
+    January(31),
+    //OCTOBER("October",31,10),
+    //NOVEMBER("November",30,11),
+    //DECEMBER("December",31,12)
 }
 
 fun generateRandomDate(): Date {
@@ -247,22 +255,28 @@ fun generateRandomDate(): Date {
     return Date(month = month, day = Random.nextInt(1,month.day))
 }
 
-fun generateActivity():CryptoActivity {
+fun generateActivity(id: Int):CryptoActivity {
     val type = ActivityTypes.values().toList().random()
     return CryptoActivity(
         type = type.typeName,
         detail = generateActivityDetail(type),
-        date = generateRandomDate(),
-        time = getRandomTime()
+        time = Time(
+            generateRandomDate(),
+            getRandomTime()
+        ),
+        id = id
     )
 }
 
 fun generateRecord(): SortedMap<Month, List<CryptoActivity>> {
+    var currentId = 0
     val result = mutableListOf<CryptoActivity>()
     repeat(100) {
-        result.add(generateActivity())
+        val newActivity = generateActivity(currentId)
+        result.add(newActivity)
+        currentId += 1
     }
-    return result.groupBy { it.date.month }.toSortedMap()
+    return result.groupBy { it.time.date.month }.toSortedMap()
 }
 
 data class Categorized(

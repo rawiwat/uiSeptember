@@ -60,6 +60,7 @@ import com.example.uiassignmentseptember.CryptoActivity
 import com.example.uiassignmentseptember.Month
 import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.SwapScreenType
+import com.example.uiassignmentseptember.Time
 import com.example.uiassignmentseptember.generateRecord
 import com.example.uiassignmentseptember.getImageIds
 import com.example.uiassignmentseptember.model.FakeDatabase
@@ -411,10 +412,10 @@ fun ActivityUI(
     val textFont = FontFamily(Font(R.font.impact))
     val topFontSize = 16.sp
     val bottomFontSize = 14.sp
-    val activityTime = if (activity.date.month == Month.TODAY) {
-        activity.time.text
+    val activityTime = if (activity.time.date.month == Month.Today) {
+        activity.time.hour.text
     } else {
-        "${activity.date.month} ${activity.date.day}"
+        "${activity.time.date.month} ${activity.time.date.day}"
     }
 
     ConstraintLayout(
@@ -495,9 +496,13 @@ fun Records(
             stickyHeader {
                 MonthHeader(text = it.month)
             }
-            val sortedTime = it.activities.sortedByDescending { it.time.value }
-            val sortedDateAndTime = sortedTime.sortedByDescending { it.date.day }
-            items(sortedDateAndTime) { activity ->
+
+            val sortedDateAndTime = it.activities.sortedWith(compareBy<CryptoActivity> { it.time.date.day }.thenBy { it.time.hour.value })
+
+            items(
+                sortedDateAndTime,
+                key = { it.id }
+            ) { activity ->
                 val imageId by rememberSaveable {
                     mutableIntStateOf(imagesIds.random())
                 }
