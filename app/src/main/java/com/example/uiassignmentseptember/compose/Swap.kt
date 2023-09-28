@@ -501,7 +501,6 @@ fun Records(
                 it.activities.sortedByDescending { it.time.date.day }
             }
 
-
             items(
                 sortedActivities,
                 key = { it.id }

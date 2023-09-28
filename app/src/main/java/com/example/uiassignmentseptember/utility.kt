@@ -198,8 +198,6 @@ fun generateActivityDetail(type:ActivityTypes):String {
         }
 }
 
-
-
 fun trimDouble(doubleValue: Double): Double {
     return String.format("%.3f", doubleValue).toDouble()
 }

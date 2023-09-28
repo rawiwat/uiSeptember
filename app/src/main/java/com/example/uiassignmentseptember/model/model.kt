@@ -69,21 +69,25 @@ data class LinkModel(
     val imageId: Int
 )
 
+@Immutable
 data class Hour(
     val text:String,
     val value:Int
 )
 
+@Immutable
 data class Date(
     val month: Month,
     val day: Int
 )
 
+@Immutable
 data class Time(
     val date: Date,
     val hour: Hour
 )
 
+@Immutable
 data class CryptoActivity(
     val type: String,
     val detail: String,
