@@ -293,8 +293,6 @@ fun Swap(
                     imagesIds = images
                 )
         }
-
-
     }
 }
 
@@ -488,7 +486,9 @@ fun Records(
                 MonthHeader(text = it.month)
             }
 
-            items(it.activities.sortedByDescending { it.time.value }) { activity ->
+            val sortedTime = it.activities.sortedByDescending { it.time.value }
+            val sortedDateAndTime = sortedTime.sortedByDescending { it.date.day }
+            items(sortedDateAndTime) { activity ->
                 val imageId = imagesIds.random()
                 ActivityUI(
                     activity = activity,
