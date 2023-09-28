@@ -26,7 +26,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -43,13 +48,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.uiassignmentseptember.Categorized
 import com.example.uiassignmentseptember.CryptoActivity
+import com.example.uiassignmentseptember.Month
 import com.example.uiassignmentseptember.R
+import com.example.uiassignmentseptember.SwapScreenType
 import com.example.uiassignmentseptember.generateRecord
 import com.example.uiassignmentseptember.getImageIds
 import com.example.uiassignmentseptember.model.FakeDatabase
@@ -73,13 +81,15 @@ fun Swap(
     val standardPadding = 8.dp
     val splitedMoney = model.current.toString().split(".")
 
+    var mode by rememberSaveable {
+        mutableStateOf(SwapScreenType.ACTIVITY)
+    }
     val record = generateRecord().map {
         Categorized(
             month = it.key.toString(),
             activities = it.value
         )
     }
-
 
     Column(
         modifier = Modifier
@@ -200,23 +210,91 @@ fun Swap(
             )
         }
 
+        Row(
 
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2)
         ) {
-            items(
-                images,
-                key = { it }
-            ) {
-                PhotoInGallery(
-                    imageId = it,
-                    size = size,
-                    navController = navController,
-                    modelId = modelId
-                )
-            }
+
+            Spacer(modifier = Modifier.width(standardPadding))
+
+            Text(
+                text = "Tokens",
+                style = TextStyle(
+                    color = if (mode == SwapScreenType.TOKEN)
+                        primaryColor
+                    else secondaryColor
+                ),
+                fontFamily = textFont,
+                fontSize = 15.sp,
+                modifier = Modifier.clickable {
+                    mode = SwapScreenType.TOKEN
+                }
+            )
+
+            Spacer(modifier = Modifier.width(standardPadding))
+
+            Text(
+                text = "NFTs",
+                style = TextStyle(
+                    color = if (mode == SwapScreenType.NFTS)
+                        primaryColor
+                    else secondaryColor
+                ),
+                fontFamily = textFont,
+                fontSize = 15.sp,
+                modifier = Modifier.clickable {
+                    mode = SwapScreenType.NFTS
+                }
+            )
+
+            Spacer(modifier = Modifier.width(standardPadding))
+
+            Text(
+                text = "Activity",
+                style = TextStyle(
+                    color = if (mode == SwapScreenType.ACTIVITY)
+                        primaryColor
+                    else secondaryColor
+                ),
+                fontFamily = textFont,
+                fontSize = 15.sp,
+                modifier = Modifier.clickable {
+                    mode = SwapScreenType.ACTIVITY
+                }
+            )
         }
+
+        Spacer(modifier = Modifier.height(standardPadding))
+
+        when(mode) {
+            SwapScreenType.TOKEN -> {
+            }
+
+            SwapScreenType.NFTS -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2)
+                ) {
+                    items(
+                        images,
+                        key = { it }
+                    ) {
+                        PhotoInGallery(
+                            imageId = it,
+                            size = size,
+                            navController = navController,
+                            modelId = modelId
+                        )
+                    }
+                }
+            }
+
+            SwapScreenType.ACTIVITY ->
+                Records(
+                    category = record,
+                    imagesIds = images
+                )
+        }
+
+
     }
 }
 
@@ -304,17 +382,104 @@ fun LinkInGallery(
 
 @Composable
 fun MonthHeader(text: String) {
-
+    Text(
+        text = text,
+        style = TextStyle(
+            color = Color.White
+        ),
+        fontSize = 16.sp,
+        fontFamily = FontFamily(Font(R.font.impact)),
+        modifier = Modifier.padding(start = 12.dp)
+    )
 }
 
 @Composable
-fun ActivityUI(activity: CryptoActivity) {
+fun ActivityUI(
+    activity: CryptoActivity,
+    imageId: Int
+) {
+    val primaryTextColor = colorResource(id = R.color.teal_200)
+    val secondaryTextColor = colorResource(id = R.color.teal_700)
+    val textFont = FontFamily(Font(R.font.impact))
+    val topFontSize = 16.sp
+    val bottomFontSize = 14.sp
+    val activityTime = if (activity.date.month == Month.TODAY) {
+        activity.time.text
+    } else {
+        "${activity.date.month} ${activity.date.day}"
+    }
 
+    ConstraintLayout(
+        modifier = Modifier
+            .height(75.dp)
+            .background(color = Color.Black)
+            .fillMaxWidth()
+    ) {
+        val (image, type, time, detail) = createRefs()
+
+        Image(
+            painter = painterResource(id = imageId),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.Center,
+            modifier = Modifier
+                .size(50.dp)
+                .padding(5.dp)
+                .clip(CircleShape)
+                .constrainAs(image) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
+        )
+
+        Text(
+            text = activity.type,
+            fontSize = topFontSize,
+            style = TextStyle(
+                color = primaryTextColor
+            ),
+            fontFamily = textFont,
+            modifier = Modifier.constrainAs(type) {
+                start.linkTo(image.end)
+                top.linkTo(parent.top, margin = 5.dp)
+                bottom.linkTo(detail.top)
+            }
+        )
+
+        Text(
+            text = activityTime,
+            style = TextStyle(
+                color = primaryTextColor
+            ),
+            fontFamily = textFont,
+            fontSize = topFontSize,
+            modifier = Modifier.constrainAs(time) {
+                top.linkTo(parent.top, margin = 5.dp)
+                end.linkTo(parent.end, margin = 12.dp)
+            }
+        )
+
+        Text(
+            text = activity.detail,
+            fontSize = bottomFontSize,
+            style = TextStyle(
+                color = secondaryTextColor
+            ),
+            fontFamily = textFont,
+            modifier = Modifier.constrainAs(detail) {
+                start.linkTo(image.end)
+                bottom.linkTo(parent.bottom, margin = 5.dp)
+                top.linkTo(type.bottom)
+            }
+        )
+    }
 }
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Records(
-    category: List<Categorized>
+    category: List<Categorized>,
+    imagesIds: List<Int>
 ) {
     LazyColumn {
         category.forEach {
@@ -322,12 +487,17 @@ fun Records(
                 MonthHeader(text = it.month)
             }
 
-            items(it.activities) { activity ->
-                ActivityUI(activity = activity)
+            items(it.activities.sortedByDescending { it.time.value }) { activity ->
+                val imageId = imagesIds.random()
+                ActivityUI(
+                    activity = activity,
+                    imageId = imageId
+                )
             }
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewGallery() {

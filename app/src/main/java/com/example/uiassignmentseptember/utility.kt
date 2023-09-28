@@ -184,13 +184,13 @@ enum class ActivityTypes(val typeName: String) {
 fun generateActivityDetail(type:ActivityTypes):String {
     val currency = listOf("ETH","BCC","BCH","BTC","DASH","ZEC","USDC")
     return when(type) {
-            ActivityTypes.SENT -> listOf("${getRandomName()} #${Random.nextInt(0,9999)} to ${getRandomName()}","${Random.nextDouble(0.001,2.0)} ${currency.random()} to ${getRandomName()}").random()
+            ActivityTypes.SENT -> listOf("${getRandomName()} #${Random.nextInt(0,9999)} to ${getRandomName()}","${trimDouble(Random.nextDouble(0.001,2.0))} ${currency.random()} to ${getRandomName()}").random()
             ActivityTypes.MINTED -> getRandomName()
-            ActivityTypes.SWAPPED -> "${Random.nextDouble(0.001,2.0)} ${currency.random()} → ${Random.nextDouble(0.001,2.0)} ${currency.random()}"
+            ActivityTypes.SWAPPED -> "${trimDouble(Random.nextDouble(0.001,2.0))} ${currency.random()} → ${trimDouble(Random.nextDouble(0.001,2.0))} ${currency.random()}"
             ActivityTypes.TRANSACTION_CONFIRM -> getRandomName()
             ActivityTypes.SOLD -> "${getRandomName()} #${Random.nextInt(0,9999)}"
-            ActivityTypes.RECEIVED -> "${Random.nextDouble(0.001,1.0)} ${currency.random()} from ${getRandomName()}"
-            ActivityTypes.APPROVED -> "${Random.nextDouble(0.001,2.0)} "
+            ActivityTypes.RECEIVED -> "${trimDouble(Random.nextDouble(0.001,2.0))} ${currency.random()} from ${getRandomName()}"
+            ActivityTypes.APPROVED -> "${trimDouble(Random.nextDouble(0.001,2.0))} ${currency.random()}"
         }
 }
 
@@ -198,6 +198,10 @@ data class ActivityTime(
     val text:String,
     val value:Int
 )
+
+fun trimDouble(doubleValue: Double): Double {
+    return String.format("%.3f", doubleValue).toDouble()
+}
 
 fun getRandomTime(): ActivityTime {
     val amORpm = listOf("pm","am").random()
@@ -223,7 +227,8 @@ data class CryptoActivity(
 data class Date(val month: Month, val day: Int)
 
 enum class Month(val monthName:String, val day: Int,val order:Int) {
-    JANUARY("January",30,1),
+    TODAY("January",30,0),
+    JANUARY("January",31,1),
     FEBRUARY("February",28,2),
     MARCH("March",31,3),
     APRIL("April",30,4),
@@ -257,7 +262,6 @@ fun generateRecord(): SortedMap<Month, List<CryptoActivity>> {
     repeat(100) {
         result.add(generateActivity())
     }
-
     return result.groupBy { it.date.month }.toSortedMap()
 }
 
@@ -266,6 +270,8 @@ data class Categorized(
     val activities: List<CryptoActivity>
 )
 
-enum class SwapScreenType() {
-    
+enum class SwapScreenType {
+    TOKEN,
+    NFTS,
+    ACTIVITY
 }
