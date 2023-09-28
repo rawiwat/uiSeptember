@@ -24,11 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -64,15 +61,14 @@ fun Gallery(
     textFont: FontFamily,
     navController: NavController
 ) {
-    val size = LocalConfiguration.current.screenWidthDp / 2
-    val model by remember {
-        mutableStateOf(FakeDatabase().getModelFromID(modelId).toModel())
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    val size = screenWidthDp / 2
+    val model = remember(modelId) {
+        FakeDatabase().getModelFromID(modelId).toModel()
     }
     val primaryColor = colorResource(id = R.color.teal_200)
     val secondaryColor = colorResource(id = R.color.teal_700)
-    val standardPadding by remember {
-        mutableStateOf(8.dp)
-    }
+    val standardPadding = 8.dp
     val splitedMoney = model.current.toString().split(".")
 
     Column(
@@ -87,15 +83,13 @@ fun Gallery(
                 containerColor = Color.Black
             )
         ) {
-            var thisFontSize by rememberSaveable {
-                mutableIntStateOf(15)
-            }
+
             Row(
                 modifier = Modifier,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = model.imageId),
+                AsyncImage(
+                    model = model.imageId,
                     contentDescription = null,
                     modifier = Modifier
                         .size(25.dp)
@@ -104,22 +98,17 @@ fun Gallery(
                 )
 
                 Text(
-                    text = " ${model.name}",
+                    text = model.name,
                     style = TextStyle(
                         color = secondaryColor
                     ),
-                    fontSize = thisFontSize.sp,
+                    fontSize = 15.sp,
                     fontFamily = textFont,
-                    modifier = Modifier.padding(3.dp),
-                    onTextLayout = { textLayoutResult ->
-                        if (textLayoutResult.didOverflowWidth) {
-                                thisFontSize -= 1
-                        }
-                    }
+                    modifier = Modifier.padding(3.dp)
                 )
 
-                Image(
-                    painter = painterResource(id = R.drawable.point_back),
+                AsyncImage(
+                    model = R.drawable.point_back,
                     contentDescription = null,
                     modifier = Modifier
                         .rotate(270f)
@@ -158,15 +147,10 @@ fun Gallery(
 
             Spacer(modifier = Modifier.width(standardPadding))
 
-            Image(
-                painter = painterResource(
-                    id = if(model.positiveGrowth)
-                        R.drawable.up
-                    else R.drawable.down
-                ),
+            AsyncImage(
+                model = if(model.positiveGrowth) R.drawable.up else R.drawable.down,
                 contentDescription = null,
-                modifier = Modifier
-                    .size(6.dp)
+                modifier = Modifier.size(6.dp)
             )
 
             Spacer(modifier = Modifier.width(5.dp))
@@ -247,7 +231,9 @@ fun PhotoInGallery(
         val painterState = painter.state
 
         if (painterState == AsyncImagePainter.State.Loading(painter)) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                color = colorResource(id = R.color.teal_200)
+            )
         } else {
             Image(
                 painter = painter,
@@ -279,8 +265,8 @@ fun LinkInGallery(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = imageId),
+            AsyncImage(
+                model = imageId,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.Center,
