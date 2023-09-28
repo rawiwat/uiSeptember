@@ -495,8 +495,12 @@ fun Records(
                 MonthHeader(text = it.month)
             }
 
-            val sortedActivities: List<CryptoActivity> = it.activities.sortedWith(compareByDescending<CryptoActivity> { it.time.date.day }
-                .thenByDescending { it.time.hour.value })
+            val sortedActivities: List<CryptoActivity> = if(it.month == "Today") {
+                it.activities.sortedByDescending { it.time.hour.value }
+            } else {
+                it.activities.sortedByDescending { it.time.date.day }
+            }
+
 
             items(
                 sortedActivities,
