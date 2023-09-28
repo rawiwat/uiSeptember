@@ -454,8 +454,9 @@ fun ActivityUI(
             fontFamily = textFont,
             fontSize = topFontSize,
             modifier = Modifier.constrainAs(time) {
-                top.linkTo(parent.top, margin = 5.dp)
+                top.linkTo(parent.top)
                 end.linkTo(parent.end, margin = 12.dp)
+                bottom.linkTo(parent.bottom)
             }
         )
 
