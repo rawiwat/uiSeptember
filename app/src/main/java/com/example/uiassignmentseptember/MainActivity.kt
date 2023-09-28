@@ -20,6 +20,7 @@ import com.example.uiassignmentseptember.compose.Swap
 import com.example.uiassignmentseptember.compose.HomeScreen
 import com.example.uiassignmentseptember.compose.InfoScreen
 import com.example.uiassignmentseptember.compose.PhotoDetail
+import com.example.uiassignmentseptember.compose.SettingScreen
 import com.example.uiassignmentseptember.compose.Transaction
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
 
@@ -155,6 +156,10 @@ fun App(navController: NavHostController,context: Context) {
                     navController = navController
                 )
             }
+        }
+
+        composable(route = "Setting") {
+            SettingScreen(navController = navController)
         }
     }
 }

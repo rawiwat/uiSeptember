@@ -217,8 +217,6 @@ fun getRandomTime(): Hour {
     )
 }
 
-
-
 enum class Month(val day: Int) {
     Today(30),
     September(30),
@@ -273,4 +271,12 @@ enum class SwapScreenType {
     TOKEN,
     NFTS,
     ACTIVITY
+}
+
+fun walletCode(walletName: String): String {
+    var hash = 0
+    for (char in walletName) {
+        hash = (hash * 31 + char.toInt()) % Int.MAX_VALUE
+    }
+    return hash.toString().substring(0,11)
 }

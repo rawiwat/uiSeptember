@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.Model
@@ -55,7 +56,20 @@ fun HomeScreen(
                 .fillMaxSize()
                 .height(1000.dp)
                 .background(Color.Black),
-            horizontalAlignment = Alignment.CenterHorizontally,) {
+            horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+
+            AsyncImage(
+                model = R.drawable.setting_icon,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(10.dp)
+                    .clickable {
+                        navController.navigate("Setting")
+                    }
+            )
+
             LazyColumn {
                 items(dataList,key = { it.id } ) {
                     ConstraintSelector(
