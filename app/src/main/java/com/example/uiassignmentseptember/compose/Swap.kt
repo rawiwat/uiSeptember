@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -84,11 +85,13 @@ fun Swap(
     var mode by rememberSaveable {
         mutableStateOf(SwapScreenType.ACTIVITY)
     }
-    val record = generateRecord().map {
-        Categorized(
-            month = it.key.toString(),
-            activities = it.value
-        )
+    val record by rememberSaveable {
+        mutableStateOf(generateRecord().map {
+            Categorized(
+                month = it.key.toString(),
+                activities = it.value
+            )
+        })
     }
 
     Column(
@@ -415,8 +418,8 @@ fun ActivityUI(
     ) {
         val (image, type, time, detail) = createRefs()
 
-        Image(
-            painter = painterResource(id = imageId),
+        AsyncImage(
+            model = imageId,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             alignment = Alignment.Center,
@@ -485,11 +488,12 @@ fun Records(
             stickyHeader {
                 MonthHeader(text = it.month)
             }
-
             val sortedTime = it.activities.sortedByDescending { it.time.value }
             val sortedDateAndTime = sortedTime.sortedByDescending { it.date.day }
             items(sortedDateAndTime) { activity ->
-                val imageId = imagesIds.random()
+                val imageId by remember {
+                    mutableIntStateOf(imagesIds.random())
+                }
                 ActivityUI(
                     activity = activity,
                     imageId = imageId
