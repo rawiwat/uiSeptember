@@ -16,7 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.uiassignmentseptember.compose.Gallery
+import com.example.uiassignmentseptember.compose.Swap
 import com.example.uiassignmentseptember.compose.HomeScreen
 import com.example.uiassignmentseptember.compose.InfoScreen
 import com.example.uiassignmentseptember.compose.PhotoDetail
@@ -120,7 +120,7 @@ fun App(navController: NavHostController,context: Context) {
         }
 
         composable(
-            route = "Gallery/{id}",
+            route = "Swap/{id}",
             arguments = listOf(
                 navArgument(name = "id") {
                     type = NavType.IntType
@@ -128,7 +128,7 @@ fun App(navController: NavHostController,context: Context) {
             )
         ) {
             if (it.arguments!=null) {
-                Gallery(
+                Swap(
                     images = getImageIds(context),
                     modelId = it.arguments!!.getInt("id"),
                     textFont = FontFamily(Font(R.font.impact)),

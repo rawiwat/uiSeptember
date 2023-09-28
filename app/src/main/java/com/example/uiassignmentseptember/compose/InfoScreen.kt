@@ -231,7 +231,7 @@ fun InfoScreen(
             ) {
                 Button(
                     onClick = {
-                        navController.navigate("Gallery/${model.id}")
+                        navController.navigate("Swap/${model.id}")
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = primaryColor,

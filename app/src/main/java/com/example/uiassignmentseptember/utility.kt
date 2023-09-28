@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.ui.unit.dp
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
+import java.util.SortedMap
+import kotlin.random.Random
 
 enum class GraphOutputType {
     HOUR,DAY,WEEK,MONTH,YEAR
@@ -167,4 +169,103 @@ fun traitsValueGenerator(traitType: Trait):String {
         Trait.ARM -> listOf("Glove","Ring","Watch","Band","Armlet").random()
         Trait.LEG -> listOf("Legging","Jeans","Pajamas","Pants","Jeggings").random()
     }
+}
+
+enum class ActivityTypes(val typeName: String) {
+    SENT("Sent"),
+    MINTED("Minted"),
+    SWAPPED("Swapped"),
+    TRANSACTION_CONFIRM("Transaction confirm"),
+    SOLD("Sold"),
+    RECEIVED("Received"),
+    APPROVED("Approved")
+}
+
+fun generateActivityDetail(type:ActivityTypes):String {
+    val currency = listOf("ETH","BCC","BCH","BTC","DASH","ZEC","USDC")
+    return when(type) {
+            ActivityTypes.SENT -> listOf("${getRandomName()} #${Random.nextInt(0,9999)} to ${getRandomName()}","${Random.nextDouble(0.001,2.0)} ${currency.random()} to ${getRandomName()}").random()
+            ActivityTypes.MINTED -> getRandomName()
+            ActivityTypes.SWAPPED -> "${Random.nextDouble(0.001,2.0)} ${currency.random()} → ${Random.nextDouble(0.001,2.0)} ${currency.random()}"
+            ActivityTypes.TRANSACTION_CONFIRM -> getRandomName()
+            ActivityTypes.SOLD -> "${getRandomName()} #${Random.nextInt(0,9999)}"
+            ActivityTypes.RECEIVED -> "${Random.nextDouble(0.001,1.0)} ${currency.random()} from ${getRandomName()}"
+            ActivityTypes.APPROVED -> "${Random.nextDouble(0.001,2.0)} "
+        }
+}
+
+data class ActivityTime(
+    val text:String,
+    val value:Int
+)
+
+fun getRandomTime(): ActivityTime {
+    val amORpm = listOf("pm","am").random()
+    val hour = Random.nextInt(1,12)
+    val minutes = Random.nextInt(0,59)
+    var value = (hour * 60) + minutes
+    if (amORpm == "pm") {
+        value += 720
+    }
+    return ActivityTime(
+        text = "$hour:$minutes$amORpm",
+        value = value
+    )
+}
+
+data class CryptoActivity(
+    val type: String,
+    val detail: String,
+    val time: ActivityTime,
+    val date: Date
+)
+
+data class Date(val month: Month, val day: Int)
+
+enum class Month(val monthName:String, val day: Int,val order:Int) {
+    JANUARY("January",30,1),
+    FEBRUARY("February",28,2),
+    MARCH("March",31,3),
+    APRIL("April",30,4),
+    MAY("May",31,5),
+    JUNE("June",30,6),
+    JULY("July",31,7),
+    AUGUST("August",31,8),
+    SEPTEMBER("September",30,9),
+    OCTOBER("October",31,10),
+    NOVEMBER("November",30,11),
+    DECEMBER("December",31,12)
+}
+
+fun generateRandomDate(): Date {
+    val month = Month.values().toList().random()
+    return Date(month = month, day = Random.nextInt(1,month.day))
+}
+
+fun generateActivity():CryptoActivity {
+    val type = ActivityTypes.values().toList().random()
+    return CryptoActivity(
+        type = type.typeName,
+        detail = generateActivityDetail(type),
+        date = generateRandomDate(),
+        time = getRandomTime()
+    )
+}
+
+fun generateRecord(): SortedMap<Month, List<CryptoActivity>> {
+    val result = mutableListOf<CryptoActivity>()
+    repeat(100) {
+        result.add(generateActivity())
+    }
+
+    return result.groupBy { it.date.month }.toSortedMap()
+}
+
+data class Categorized(
+    val month: String,
+    val activities: List<CryptoActivity>
+)
+
+enum class SwapScreenType() {
+    
 }

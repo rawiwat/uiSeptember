@@ -1,5 +1,6 @@
 package com.example.uiassignmentseptember.compose
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -23,8 +26,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,7 +36,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -46,16 +46,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import coil.compose.rememberImagePainter
+import com.example.uiassignmentseptember.Categorized
+import com.example.uiassignmentseptember.CryptoActivity
 import com.example.uiassignmentseptember.R
+import com.example.uiassignmentseptember.generateRecord
 import com.example.uiassignmentseptember.getImageIds
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.toModel
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
 
 @Composable
-fun Gallery(
+fun Swap(
     images: List<Int>,
     modelId: Int,
     textFont: FontFamily,
@@ -70,6 +72,14 @@ fun Gallery(
     val secondaryColor = colorResource(id = R.color.teal_700)
     val standardPadding = 8.dp
     val splitedMoney = model.current.toString().split(".")
+
+    val record = generateRecord().map {
+        Categorized(
+            month = it.key.toString(),
+            activities = it.value
+        )
+    }
+
 
     Column(
         modifier = Modifier
@@ -190,6 +200,8 @@ fun Gallery(
             )
         }
 
+
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(2)
         ) {
@@ -221,11 +233,11 @@ fun PhotoInGallery(
             .size(size.dp)
             .padding(5.dp)
     ) {
-        val painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(data = imageId).apply(block = fun ImageRequest.Builder.() {
-                    crossfade(500)
-                }
-            ).build()
+        val painter = rememberImagePainter(
+            data = imageId,
+            builder = {
+                crossfade(500)
+            }
         )
 
         val painterState = painter.state
@@ -289,11 +301,38 @@ fun LinkInGallery(
         }
     }
 }
+
+@Composable
+fun MonthHeader(text: String) {
+
+}
+
+@Composable
+fun ActivityUI(activity: CryptoActivity) {
+
+}
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun Records(
+    category: List<Categorized>
+) {
+    LazyColumn {
+        category.forEach {
+            stickyHeader {
+                MonthHeader(text = it.month)
+            }
+
+            items(it.activities) { activity ->
+                ActivityUI(activity = activity)
+            }
+        }
+    }
+}
 @Preview(showBackground = true)
 @Composable
 fun PreviewGallery() {
     UiAssignmentSeptemberTheme {
-        Gallery(
+        Swap(
             images = getImageIds(LocalContext.current),
             modelId = 3,
             textFont = FontFamily(Font(R.font.impact)),
