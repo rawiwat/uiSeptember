@@ -4,6 +4,10 @@ import android.content.Context
 import androidx.compose.ui.unit.dp
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
+import com.example.uiassignmentseptember.model.CryptoActivity
+import com.example.uiassignmentseptember.model.Date
+import com.example.uiassignmentseptember.model.Hour
+import com.example.uiassignmentseptember.model.Time
 import java.util.SortedMap
 import kotlin.random.Random
 
@@ -194,10 +198,7 @@ fun generateActivityDetail(type:ActivityTypes):String {
         }
 }
 
-data class Hour(
-    val text:String,
-    val value:Int
-)
+
 
 fun trimDouble(doubleValue: Double): Double {
     return String.format("%.3f", doubleValue).toDouble()
@@ -218,21 +219,7 @@ fun getRandomTime(): Hour {
     )
 }
 
-data class Time(
-    val date: Date,
-    val hour: Hour
-)
-data class CryptoActivity(
-    val type: String,
-    val detail: String,
-    val time: Time,
-    val id: Int
-)
 
-data class Date(
-    val month: Month,
-    val day: Int
-)
 
 enum class Month(val day: Int) {
     Today(30),
@@ -255,7 +242,7 @@ fun generateRandomDate(): Date {
     return Date(month = month, day = Random.nextInt(1,month.day))
 }
 
-fun generateActivity(id: Int):CryptoActivity {
+fun generateActivity(id: Int): CryptoActivity {
     val type = ActivityTypes.values().toList().random()
     return CryptoActivity(
         type = type.typeName,

@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.model.LineChartData
 import com.example.uiassignmentseptember.GraphOutputType
+import com.example.uiassignmentseptember.Month
 
 @Immutable
 data class Model(
@@ -67,3 +68,26 @@ data class LinkModel(
     val name: String,
     val imageId: Int
 )
+
+data class Hour(
+    val text:String,
+    val value:Int
+)
+
+data class Date(
+    val month: Month,
+    val day: Int
+)
+
+data class Time(
+    val date: Date,
+    val hour: Hour
+)
+
+data class CryptoActivity(
+    val type: String,
+    val detail: String,
+    val time: Time,
+    val id: Int
+)
+

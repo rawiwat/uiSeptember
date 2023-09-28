@@ -42,7 +42,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -56,13 +55,12 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.uiassignmentseptember.Categorized
-import com.example.uiassignmentseptember.CryptoActivity
 import com.example.uiassignmentseptember.Month
 import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.SwapScreenType
-import com.example.uiassignmentseptember.Time
 import com.example.uiassignmentseptember.generateRecord
 import com.example.uiassignmentseptember.getImageIds
+import com.example.uiassignmentseptember.model.CryptoActivity
 import com.example.uiassignmentseptember.model.FakeDatabase
 import com.example.uiassignmentseptember.model.toModel
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
@@ -497,10 +495,11 @@ fun Records(
                 MonthHeader(text = it.month)
             }
 
-            val sortedDateAndTime = it.activities.sortedWith(compareBy<CryptoActivity> { it.time.date.day }.thenBy { it.time.hour.value })
+            val sortedActivities: List<CryptoActivity> = it.activities.sortedWith(compareByDescending<CryptoActivity> { it.time.date.day }
+                .thenByDescending { it.time.hour.value })
 
             items(
-                sortedDateAndTime,
+                sortedActivities,
                 key = { it.id }
             ) { activity ->
                 val imageId by rememberSaveable {
