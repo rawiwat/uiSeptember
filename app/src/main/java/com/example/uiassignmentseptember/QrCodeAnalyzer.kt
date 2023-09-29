@@ -50,8 +50,9 @@ class QrCodeAnalyzer(
                 onQrCodeScanned(result.text)
             } catch(e:Exception) {
                 e.printStackTrace()
+            } finally {
+                image.close()
             }
-
         }
     }
 

@@ -24,14 +24,32 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.example.uiassignmentseptember.QrCodeAnalyzer
 import android.Manifest
+import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.uiassignmentseptember.R
 
 @Composable
 fun QrCodeScanner(
     context: Context
 ) {
-
+    val paddingText = LocalConfiguration.current.screenHeightDp / 4
     var code by remember {
         mutableStateOf("")
     }
@@ -61,6 +79,7 @@ fun QrCodeScanner(
     LaunchedEffect(key1 = true) {
         launcher.launch(Manifest.permission.CAMERA)
     }
+
     Column(
       modifier = Modifier.fillMaxSize()
     ) {
@@ -85,6 +104,8 @@ fun QrCodeScanner(
                     ContextCompat.getMainExecutor(context),
                     QrCodeAnalyzer { result ->
                         code = result
+                        Toast.makeText(context,code,Toast.LENGTH_SHORT).show()
+                        println(code)
                     }
                 )
 
@@ -100,10 +121,40 @@ fun QrCodeScanner(
                 }
 
                 previewView
-            })
+            },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            )
         }
-
     }
+
+    Image(
+        painter = painterResource(id = R.drawable.qrcode_screen),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxSize(),
+        contentScale = ContentScale.Crop,
+        colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(
+            Color.Black.copy(alpha = 0.5f)
+        )
+    )
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Scan a QR code",
+            style = TextStyle(
+                color = Color.White
+            ),
+            modifier = Modifier
+                .padding(top = paddingText.dp),
+            fontSize = 16.sp,
+        )
+    }
+
 }
 
 @androidx.compose.ui.tooling.preview.Preview(showBackground = true)

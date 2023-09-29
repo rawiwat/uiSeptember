@@ -26,6 +26,7 @@ import com.example.uiassignmentseptember.compose.Swap
 import com.example.uiassignmentseptember.compose.Transaction
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
 import android.Manifest
+import com.example.uiassignmentseptember.compose.QrCodeScanner
 
 //@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -162,6 +163,10 @@ fun App(navController: NavHostController,context: Context) {
 
         composable(route = "Setting") {
             SettingScreen(navController = navController)
+        }
+
+        composable(route = "QR Code") {
+            QrCodeScanner(context = context)
         }
     }
 }

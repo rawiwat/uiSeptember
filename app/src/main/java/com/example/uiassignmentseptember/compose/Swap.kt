@@ -204,12 +204,15 @@ fun Swap(
             )
 
             LinkInGallery(
-                imageId = R.drawable.share_plane,
-                text = "Share",
+                imageId = R.drawable.qr_code_icon,
+                text = "Scan",
                 modifier = Modifier
                     .padding(standardPadding)
                     .width((size - 30).dp)
                     .height(50.dp)
+                    .clickable {
+                        navController.navigate("QR Code")
+                    }
             )
         }
 
