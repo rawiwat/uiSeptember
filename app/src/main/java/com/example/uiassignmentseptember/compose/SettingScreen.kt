@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.uiassignmentseptember.R
 import com.example.uiassignmentseptember.walletCode
 
@@ -92,9 +93,11 @@ fun SettingScreen(
             ) {
                 Spacer(modifier = Modifier.height(10.dp))
 
-                SettingHeader(text = "Wallet Setting")
-                SettingWallet(text = "Obama")
-                SettingWallet(text = "Joe Biden")
+                Column {
+                    SettingHeader(text = "Wallet Setting")
+                    SettingWallet(text = "Obama")
+                    SettingWallet(text = "Joe Biden")
+                }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -176,8 +179,8 @@ fun SettingBody(
     ) {
         val (mainText,arrow,image,secondText) = createRefs()
 
-        Image(
-            painter = painterResource(id = imageId),
+        AsyncImage(
+            model = imageId,
             contentDescription = null,
             modifier = Modifier
                 .size(35.dp)
@@ -193,7 +196,7 @@ fun SettingBody(
             text = text,
             fontSize = 16.sp,
             style = TextStyle(
-                color = colorResource(id = R.color.teal_200)
+                color = Color.White
             ),
             fontFamily = FontFamily(Font(R.font.impact)),
             modifier = Modifier.constrainAs(mainText) {
@@ -203,8 +206,8 @@ fun SettingBody(
             }
         )
 
-        Image(
-            painter = painterResource(id = R.drawable.point_back),
+        AsyncImage(
+            model = R.drawable.point_back,
             contentDescription = null,
             modifier = Modifier
                 .size(20.dp)
@@ -218,7 +221,7 @@ fun SettingBody(
 
         Text(
             text = endText,
-            fontSize = 16.sp,
+            fontSize = 13.sp,
             style = TextStyle(
                 color = colorResource(id = R.color.teal_700)
             ),
@@ -246,13 +249,13 @@ fun SettingWallet(
             .height(50.dp)
             .background(color = Color.Black)
     ) {
-        val (mainText,arrow,image,bottomText) = createRefs()
+        val (mainText,arrow,image,secondText) = createRefs()
 
-        Image(
-            painter = painterResource(id = R.drawable.wallet_icon),
+        AsyncImage(
+            model = R.drawable.wallet_icon,
             contentDescription = null,
             modifier = Modifier
-                .size(45.dp)
+                .size(40.dp)
                 .constrainAs(image) {
                     start.linkTo(parent.start, margin = 15.dp)
                     top.linkTo(parent.top)
@@ -265,46 +268,18 @@ fun SettingWallet(
             text = text,
             fontSize = 16.sp,
             style = TextStyle(
-                color = colorResource(id = R.color.teal_200)
+                color = Color.White
             ),
             fontFamily = FontFamily(Font(R.font.impact)),
             modifier = Modifier.constrainAs(mainText) {
                 start.linkTo(image.end, margin = 8.dp)
-                bottom.linkTo(parent.bottom)
-                top.linkTo(parent.top)
+                bottom.linkTo(secondText.top)
+                top.linkTo(parent.top, margin = 8.dp)
             }
         )
 
-        Text(
-            text = text,
-            fontSize = 16.sp,
-            style = TextStyle(
-                color = colorResource(id = R.color.teal_700)
-            ),
-            fontFamily = FontFamily(Font(R.font.impact)),
-            modifier = Modifier.constrainAs(mainText) {
-                start.linkTo(image.end, margin = 8.dp)
-                bottom.linkTo(bottomText.top)
-                top.linkTo(parent.top)
-            }
-        )
-
-        Text(
-            text = walletId,
-            fontSize = 16.sp,
-            style = TextStyle(
-                color = colorResource(id = R.color.teal_700)
-            ),
-            fontFamily = FontFamily(Font(R.font.impact)),
-            modifier = Modifier.constrainAs(mainText) {
-                start.linkTo(image.end, margin = 8.dp)
-                bottom.linkTo(parent.bottom)
-                top.linkTo(mainText.bottom)
-            }
-        )
-
-        Image(
-            painter = painterResource(id = R.drawable.point_back),
+        AsyncImage(
+            model = R.drawable.point_back,
             contentDescription = null,
             modifier = Modifier
                 .size(20.dp)
@@ -314,6 +289,20 @@ fun SettingWallet(
                     bottom.linkTo(parent.bottom)
                 }
                 .rotate(180f)
+        )
+
+        Text(
+            text = walletId,
+            fontSize = 12.sp,
+            style = TextStyle(
+                color = colorResource(id = R.color.teal_700)
+            ),
+            fontFamily = FontFamily(Font(R.font.impact)),
+            modifier = Modifier.constrainAs(secondText) {
+                bottom.linkTo(parent.bottom, margin = 8.dp)
+                top.linkTo(mainText.bottom)
+                start.linkTo(image.end, margin = 8.dp)
+            }
         )
     }
 }
@@ -339,3 +328,10 @@ fun SettingComponent(
 fun PreviewSetting() {
     SettingScreen(navController = NavController(LocalContext.current))
 }
+
+@Preview
+@Composable
+fun PreviewWallet() {
+    SettingWallet(text = "Joe Biden")
+}
+

@@ -278,5 +278,5 @@ fun walletCode(walletName: String): String {
     for (char in walletName) {
         hash = (hash * 31 + char.toInt()) % Int.MAX_VALUE
     }
-    return hash.toString().substring(0,11)
+    return hash.toString()
 }

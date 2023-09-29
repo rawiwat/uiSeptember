@@ -1,6 +1,7 @@
 package com.example.uiassignmentseptember
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,13 +18,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.uiassignmentseptember.compose.Swap
 import com.example.uiassignmentseptember.compose.HomeScreen
 import com.example.uiassignmentseptember.compose.InfoScreen
 import com.example.uiassignmentseptember.compose.PhotoDetail
 import com.example.uiassignmentseptember.compose.SettingScreen
+import com.example.uiassignmentseptember.compose.Swap
 import com.example.uiassignmentseptember.compose.Transaction
 import com.example.uiassignmentseptember.ui.theme.UiAssignmentSeptemberTheme
+import android.Manifest
 
 //@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -33,7 +36,6 @@ class MainActivity : ComponentActivity() {
             UiAssignmentSeptemberTheme {
                 navController = rememberNavController()
                 App(navController as NavHostController,this@MainActivity)
-                //NavigationScreen(context = this@MainActivity)
             }
         }
     }
